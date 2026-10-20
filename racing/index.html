@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>LovkoTech — модуль інженерних перегонів</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#FFFFFF;--surface:#F6F6F4;--surface2:#EDEDEA;--ink:#16161A;--ink2:#34343B;--muted:#5E5E66;--line:#E3E3DF;
+  --red:#E10600;--red-dark:#B00500;--on-red:#FFFFFF;--purple:#6A1FC9;--green:#0E7A3A;--amber:#8A5A00;
+  --display:'Unbounded','Arial Black',Arial,sans-serif;--text:'Manrope',Arial,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--text);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:28px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.2px;border:0;background:none;padding:0;cursor:pointer}
+.logo svg{flex:0 0 auto}
+nav.main{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+nav.main::-webkit-scrollbar{display:none}
+nav.main button{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap;position:relative}
+nav.main button[aria-current="page"]{color:var(--ink)}
+nav.main button[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-13px;height:3px;background:var(--red);transform:skewX(-20deg)}
+.live{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);white-space:nowrap}
+.live i{width:7px;height:7px;border-radius:50%;background:#B8B8B2}
+.live.on i{background:var(--red);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media (max-width:760px){.bar{height:auto;flex-wrap:wrap;gap:8px 16px;padding:10px 0}nav.main{order:3;flex-basis:100%}nav.main button[aria-current="page"]::after{bottom:-6px}}
+
+main{padding:40px 0 80px;min-height:70vh}
+h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.5px;margin:0;line-height:1.12}
+h1{font-size:clamp(30px,5vw,54px);text-wrap:balance}
+h2{font-size:clamp(22px,2.6vw,30px)}
+h3{font-size:17px;font-weight:500;letter-spacing:-.2px}
+.lede{color:var(--muted);max-width:62ch;margin:12px 0 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.sec-title{display:flex;align-items:center;gap:12px}
+.sec-title::before{content:"";width:6px;height:26px;background:var(--red);transform:skewX(-18deg);flex:0 0 auto}
+
+/* signature shapes */
+.kerb{height:8px;background:repeating-linear-gradient(90deg,var(--red) 0 28px,#fff 28px 56px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tag{display:inline-block;background:var(--red);color:var(--on-red);font-size:12px;font-weight:700;padding:4px 12px;transform:skewX(-14deg);white-space:nowrap}
+.tag>span{display:inline-block;transform:skewX(14deg)}
+.tag.ink{background:var(--ink)}.tag.soft{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.cut{clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%)}
+.card{background:var(--surface);padding:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:transparent;padding:10px 18px;cursor:pointer;font-weight:700;font-size:14px;transform:skewX(-10deg)}
+.btn>span{display:inline-block;transform:skewX(10deg)}
+.btn.red{background:var(--red);border-color:var(--red);color:var(--on-red)}
+.btn.red:hover{background:var(--red-dark);border-color:var(--red-dark)}
+.btn.ink{background:var(--ink);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:6px 12px;font-size:13px}
+.chev::after{content:"";display:inline-block;width:8px;height:8px;border-right:2px solid currentColor;border-top:2px solid currentColor;transform:rotate(45deg);margin-left:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.verified{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--red)}
+.verified svg{flex:0 0 auto}
+.pending{font-size:12px;font-weight:700;color:var(--amber)}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);padding:28px;text-align:center;background:var(--surface)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;padding:24px 0 40px}
+.hero .when{display:flex;gap:28px;margin:28px 0;flex-wrap:wrap}
+.hero .when div small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.hero .when div b{font-family:var(--display);font-weight:500;font-size:20px}
+.count{font-family:var(--display);font-weight:600;font-size:clamp(64px,9vw,112px);line-height:.9;letter-spacing:-3px}
+.count small{font-family:var(--text);font-size:14px;letter-spacing:0;font-weight:600;color:var(--muted);display:block;margin-top:6px}
+.trackbox{position:relative}
+.trackbox .tlabel{position:absolute;left:0;bottom:0;font-size:12px;color:var(--muted)}
+@media (max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:8px 0 56px}
+.stats div{padding:22px 0}.stats div+div{border-left:1px solid var(--line);padding-left:24px}
+.stats b{font-family:var(--display);font-weight:500;font-size:34px;display:block}
+.stats span{color:var(--muted);font-size:14px}
+@media (max-width:560px){.stats{grid-template-columns:1fr}.stats div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)}}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+
+/* vote bars */
+.vote-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.vote-row .vb{grid-column:1/-1;height:6px;background:var(--surface2)}
+.vote-row .vb i{display:block;height:100%;background:var(--ink);transform-origin:left;transition:width .5s}
+.vote-row.lead .vb i{background:var(--red)}
+
+/* grids */
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.track-card{display:flex;flex-direction:column;gap:10px}
+.track-card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.track-card .spec{display:flex;gap:18px;font-size:13px;color:var(--muted)}
+.track-card .spec b{color:var(--ink);font-family:var(--mono);font-weight:500}
+.track-card.mine{outline:2px solid var(--red);outline-offset:-2px}
+.build{display:flex;flex-direction:column;gap:12px}
+.build dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.build dt{color:var(--muted)}.build dd{margin:0}
+.build .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:13px}
+.ver{font-family:var(--mono);font-size:12px;border:1px solid var(--ink);padding:1px 6px}
+
+/* announcements */
+.ann{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:24px;align-items:center;padding:24px 0;border-bottom:1px solid var(--line)}
+.ann .date b{font-family:var(--display);font-weight:500;font-size:44px;line-height:1;display:block}
+.ann .date span{font-size:13px;font-weight:600;color:var(--muted)}
+.ann h3{font-size:20px;margin:8px 0 4px}
+@media (max-width:640px){.ann{grid-template-columns:80px minmax(0,1fr)}.ann .act{grid-column:1/-1}}
+
+/* forms */
+.panel{border:1px solid var(--line);padding:24px;background:#fff}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 6px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:0}
+input:focus,select:focus,textarea:focus{border-color:var(--ink);outline:none}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:14px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+.actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+
+/* race */
+.subnav{display:flex;gap:0;border:1px solid var(--line);width:max-content;max-width:100%;overflow-x:auto;margin-bottom:28px}
+.subnav button{border:0;background:#fff;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.subnav button+button{border-left:1px solid var(--line)}
+.subnav button[aria-current="true"]{background:var(--ink);color:#fff}
+.team{border-left:4px solid var(--amber)}.team.ok{border-left-color:var(--green)}
+.check{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:14px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--green);margin:0}
+.state-ok{color:var(--green);font-weight:700;font-size:13px}.state-wait{color:var(--amber);font-weight:700;font-size:13px}
+.warn{color:var(--red);font-size:13px;font-weight:600}
+.clock{font-size:clamp(52px,11vw,104px);font-weight:700;line-height:1;margin:18px 0;letter-spacing:-2px}
+.clock.run{color:var(--red)}
+.laps{list-style:none;margin:0;padding:0}
+.laps li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
+.link{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+.tower{border-top:3px solid var(--ink)}
+.tower table{width:100%;border-collapse:collapse}
+.scroll{overflow-x:auto}
+.tower th{text-align:left;font-size:12px;font-weight:700;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
+.tower td{padding:14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.pos{width:64px}
+.pos span{display:inline-flex;width:40px;height:32px;align-items:center;justify-content:center;background:var(--ink);color:#fff;font-family:var(--display);font-weight:600;transform:skewX(-12deg)}
+.pos span b{transform:skewX(12deg);font-weight:600}
+tr.p1 .pos span{background:var(--red)}
+.tname{font-family:var(--display);font-weight:500;font-size:16px}
+.tname small{display:block;font-family:var(--text);font-size:12px;color:var(--muted);font-weight:500}
+.fastest{color:var(--purple);font-weight:700}
+.flash td{animation:fl 2.4s ease-out}
+@keyframes fl{0%,40%{background:#FFF0EF}100%{background:transparent}}
+body.kiosk header,body.kiosk .subnav,body.kiosk footer,body.kiosk .notkiosk{display:none}
+body.kiosk .tower td{font-size:22px;padding:20px 16px}body.kiosk .tname{font-size:24px}
+.rules{margin:0;padding:0;list-style:none;counter-reset:r}
+.rules li{counter-increment:r;display:grid;grid-template-columns:36px minmax(0,1fr);padding:10px 0;border-bottom:1px solid var(--line)}
+.rules li::before{content:counter(r);font-family:var(--mono);color:var(--red);font-weight:700}
+.partners{padding:8px 0 48px}
+.partners-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.marquee-track{display:flex;width:max-content;animation:marq 48s linear infinite}
+.marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
+@keyframes marq{to{transform:translateX(-50%)}}
+.plogo{display:flex;align-items:center;gap:12px;padding:22px 36px;border-right:1px solid var(--line);color:#8A8A92;white-space:nowrap;transition:color .2s}
+.plogo:hover{color:var(--ink)}
+.plogo svg{flex:0 0 auto}
+.plogo b{font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:-.3px}
+.plogo small{display:block;font-size:11px;font-weight:700;color:var(--muted)}
+.plogo.gold b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.marquee{overflow-x:auto}}
+body.kiosk .partners{display:none}
+footer{border-top:1px solid var(--line);padding:24px 0 40px;font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) skewX(-10deg);background:var(--ink);color:#fff;padding:10px 18px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+svg.track{width:100%;height:auto;display:block;overflow:visible}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <button class="logo" data-go="home" aria-label="LovkoTech — на головну">
+      <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><path d="M6 0h8L8 20H0z" fill="#E10600"/><path d="M17 0h13l-6 20H11z" fill="#16161A"/></svg>
+      LovkoTech
+    </button>
+    <nav class="main" id="nav" aria-label="Розділи">
+      <button data-go="home">Головна</button>
+      <button data-go="news">Анонси</button>
+      <button data-go="tracks">Траси</button>
+      <button data-go="builds">Конструктори</button>
+      <button data-go="makers">Виробники</button>
+      <button data-go="race">Гонка</button>
+    </nav>
+  </div>
+</header>
+<main><div class="wrap" id="main"></div></main>
+<section class="partners" aria-labelledby="partners-title">
+  <div class="wrap partners-head"><h2 class="sec-title" id="partners-title">Спонсори та партнери</h2><button class="btn sm" data-a="partner"><span class="chev">Стати партнером</span></button></div>
+  <div class="marquee" id="marquee"></div>
+</section>
+<footer><div class="wrap">LovkoTech — демо платформи для Youthquake 2026. Команди, конструктори, постачальники, спонсори й результати в демо вигадані; назви університетів використано лише для ілюстрації і не означають партнерства.</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============ constants ============ */
+const CLASSES={"Міні-боліди 1:10":{mass:3},"Автономні мікродрони":{mass:0.25},"Мобільні роботи":{mass:5}};
+const CHECKS=[["mass","Маса в межах класу"],["estop","Аварійна кнопка / E-stop"],["battery","Ізоляція та кріплення батареї"],["sensors","Датчики й транспондер"]];
+const PENALTY=2000;
+const COLS=["universities","builds","suppliers","announcements","votes","teams","laps"];
+
+/* ============ state ============ */
+let state={event:null};COLS.forEach(c=>state[c]=[]);
+let ui={view:"home",race:"board",buildFilter:"all",makerFilter:"all",editBuild:null,editEvent:false};
+try{Object.assign(ui,JSON.parse(localStorage.getItem("pw2.ui")||"{}"));ui.editBuild=null;ui.editEvent=false}catch(e){}
+const drafts={};
+let uid=null,lastLap=null,flashTeam=null;
+let judge={team:"",start:null,running:false,pen:0,raf:0};
+
+/* ============ helpers ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uni=id=>state.universities.find(u=>u.id===id);
+const fmt=ms=>{if(ms==null)return"—";const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),t=ms%1000;return`${m}:${String(s).padStart(2,"0")}.${String(t).padStart(3,"0")}`};
+function parseTime(v){v=v.trim().replace(",",".");let m=v.match(/^(\d+):(\d{1,2})(?:\.(\d{1,3}))?$/);if(m)return m[1]*60000+m[2]*1000+(m[3]?+m[3].padEnd(3,"0"):0);m=v.match(/^(\d+)(?:\.(\d{1,3}))?$/);return m?m[1]*1000+(m[2]?+m[2].padEnd(3,"0"):0):null}
+const dateParts=d=>{const x=new Date(d+"T12:00");return{day:x.getDate(),mon:x.toLocaleDateString("uk-UA",{month:"short"}).replace(".",""),full:x.toLocaleDateString("uk-UA",{day:"numeric",month:"long",year:"numeric"})}};
+const daysTo=d=>Math.ceil((new Date(d+"T09:00")-new Date())/86400000);
+const plural=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c};
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("show"),2200)}
+const admitted=t=>CHECKS.every(([k])=>t.checks&&t.checks[k]);
+const saveUi=()=>{try{localStorage.setItem("pw2.ui",JSON.stringify({view:ui.view,race:ui.race,buildFilter:ui.buildFilter,makerFilter:ui.makerFilter}))}catch(e){}};
+const d=(form,field,def)=>drafts[form]&&field in drafts[form]?drafts[form][field]:def;
+const verifiedMark=`<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 0h12l-2 14H0z" fill="#E10600"/><path d="M4 7.2l2 2 4-4.4" stroke="#fff" stroke-width="1.8" fill="none"/></svg>`;
+
+/* ============ unique circuit generator ============ */
+function rng(seed){let s=seed>>>0||1;return()=>(s=(s*1664525+1013904223)>>>0)/4294967296}
+function circuit(seed,turns){
+  const r=rng(seed*7919+13),n=Math.max(7,Math.min(14,turns+1)),pts=[];
+  for(let i=0;i<n;i++){
+    const a=-Math.PI/2+i*2*Math.PI/n+(r()-.5)*0.35;
+    let rad=0.62+r()*0.38;if(r()<0.28)rad*=0.62;
+    pts.push([300+Math.cos(a)*250*rad,150+Math.sin(a)*132*rad]);
+  }
+  let p=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<n;i++){const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    p+=` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`}
+  return{path:p+"Z",start:pts[0],next:pts[1],pts};
+}
+function trackSVG(u,{big=false}={}){
+  if(!u||!u.track)return"";
+  const c=circuit(u.track.seed,u.track.turns),[sx,sy]=c.start,ang=Math.atan2(c.next[1]-sy,c.next[0]-sx)*180/Math.PI;
+  const turnsLbl=big?c.pts.slice(1).map((p,i)=>`<text x="${(p[0]+(p[0]-300)*0.1).toFixed(1)}" y="${(p[1]+(p[1]-150)*0.14+4).toFixed(1)}" font-size="11" font-family="JetBrains Mono,monospace" fill="#5E5E66" text-anchor="middle">${i+1}</text>`).join(""):"";
+  return`<svg class="track" viewBox="0 0 600 300" role="img" aria-label="Схема траси «${esc(u.track.name)}»: ${u.track.lengthM} м, ${u.track.turns} поворотів">
+  <path d="${c.path}" fill="none" stroke="#EDEDEA" stroke-width="${big?22:18}" stroke-linejoin="round"/>
+  <path d="${c.path}" fill="none" stroke="#16161A" stroke-width="${big?4:3.5}" stroke-linejoin="round"/>
+  <path d="${c.path}" pathLength="300" fill="none" stroke="#E10600" stroke-width="${big?4:3.5}" stroke-dasharray="100 200" stroke-linejoin="round"/>
+  <g transform="translate(${sx.toFixed(1)} ${sy.toFixed(1)}) rotate(${ang.toFixed(1)})"><rect x="-3" y="-13" width="6" height="26" fill="#fff" stroke="#16161A" stroke-width="1.5"/><rect x="-3" y="-13" width="3" height="6.5" fill="#16161A"/><rect x="0" y="-6.5" width="3" height="6.5" fill="#16161A"/><rect x="-3" y="0" width="3" height="6.5" fill="#16161A"/><rect x="0" y="6.5" width="3" height="6.5" fill="#16161A"/></g>
+  ${turnsLbl}</svg>`;
+}
+
+/* ============ demo data ============ */
+function demoData(){
+  const now=Date.now();
+  const universities=[
+    ["u1","НТУ «Дніпровська політехніка»","Дніпро","Кільце Політехніки",420,9,7,true,"3D-друк, фрезерування ЧПК, паяння плат"],
+    ["u2","КПІ ім. Ігоря Сікорського","Київ","Петля Сікорського",510,11,13,true,"Лазерна різка, композити"],
+    ["u3","Львівська політехніка","Львів","Львівські пагорби",460,12,21,true,"Лиття пластику, 3D-друк"],
+    ["u4","Харківський політехнічний інститут","Харків","Харківський спринт",380,7,4,false,""],
+    ["u5","Одеська політехніка","Одеса","Портова траса",440,10,33,true,"Токарна обробка, зварювання"],
+    ["u6","Запорізька політехніка","Запоріжжя","Дніпровський вигин",400,8,9,false,""]
+  ].map(([id,name,city,tn,len,turns,seed,man,caps],i)=>({id,order:i,name,city,manufacture:man,capabilities:caps,verified:true,track:{name:tn,lengthM:len,turns,seed}}));
+  const builds=[
+    ["b1","u1","Volt-3","Міні-боліди 1:10",2.6,"BLDC 3650, 3900KV","2S LiPo, 7.4 В, 5000 мА·год","Задній, диференціал","Датчик Холла, IMU","Відкрита",3,"Нова підвіска, мінус 180 г"],
+    ["b2","u2","Apex R","Міні-боліди 1:10",2.9,"BLDC 3660, 3200KV","3S LiPo, 11.1 В, 4000 мА·год","Повний","IMU, енкодери","За запитом",2,"Жорсткіше шасі"],
+    ["b3","u3","Sokil-M","Автономні мікродрони",0.24,"4 × 1103, 10000KV","1S LiPo, 450 мА·год","—","ESP32-CAM, ToF-далекомір","Відкрита",2,"Новий алгоритм розпізнавання воріт"],
+    ["b4","u5","Breeze","Міні-боліди 1:10",2.8,"BLDC 3650, 4000KV","2S LiPo, 7.4 В, 6000 мА·год","Задній","IMU","Відкрита",1,"Перша версія"],
+    ["b5","u4","Tracker-2","Мобільні роботи",4.1,"2 × DC 12 В з редуктором","3S Li-ion, 11.1 В","Гусеничний","Лідар, лінійні датчики","За запитом",2,"Лідар замість ІЧ-датчиків"]
+  ].map(([id,uniId,name,cls,mass,motor,battery,drive,sensors,license,version,note],i)=>({id,uniId,name,cls,mass,motor,battery,drive,sensors,license,version,note,desc:"",updatedAt:now-i*86400000*3}));
+  const suppliers=[
+    ["s1","Кіловат Компоненти","Київ","Електроніка","Мотори BLDC, регулятори ESC, LiPo-батареї",true],
+    ["s2","PrintFab Дніпро","Дніпро","Виготовлення деталей","SLA- і FDM-друк, нейлон, карбон-заповнені пластики",true],
+    ["s3","Roboparts UA","Львів","Електроніка","ESP32, датчики, лідари, транспондери",true],
+    ["s4","Шасі-Про","Харків","Механіка","Карбонові пластини, підвіска для масштабу 1:10",false]
+  ].map(([id,name,city,category,offers,verified])=>({id,name,city,category,offers,verified}));
+  const announcements=[
+    ["a1","Кубок LovkoTech · Етап 1","2026-11-14","Міні-боліди 1:10","u1","registration","Перший міжвузівський етап. Реєстрація команд і техком — онлайн."],
+    ["a2","Autonomy Challenge","2026-12-05","Автономні мікродрони","u3","soon","Автономне проходження воріт без пілота. Регламент буде опубліковано 1 листопада."],
+    ["a3","Зимовий спринт","2027-02-20","Міні-боліди 1:10","","vote","Місце проведення обирають учасники: голосуйте за трасу."]
+  ].map(([id,title,date,cls,venueUniId,status,body])=>({id,title,date,cls,venueUniId,status,body}));
+  const votes=[["v1","u1"],["v2","u1"],["v3","u2"],["v4","u3"],["v5","u1"],["v6","u5"],["v7","u3"]].map(([id,uniId],i)=>({id,uniId,at:now-i*1000}));
+  const teams=[["t1","Dnipro Volt","u1","b1",2.6,7.4,[1,1,1,1]],["t2","Odesa Current","u5","b4",2.8,7.4,[1,1,1,1]],["t3","KPI Apex","u2","b2",2.9,11.1,[1,1,1,1]],["t4","Lviv Torque","u3","",3.2,11.1,[0,1,1,0]]]
+    .map(([id,name,uniId,buildId,mass,volt,c],i)=>({id,name,uniId,buildId,mass,volt,createdAt:now+i,checks:{mass:!!c[0],estop:!!c[1],battery:!!c[2],sensors:!!c[3]}}));
+  const laps=[["t1",42310,0],["t2",43880,2000],["t3",41975,0],["t1",41620,0],["t2",42410,0],["t3",42050,2000]].map(([teamId,ms,penaltyMs],i)=>({id:"l"+i,teamId,ms,penaltyMs,at:now-60000+i*5000}));
+  const event={name:"Кубок LovkoTech · Етап 1",cls:"Міні-боліди 1:10",date:"2026-11-14",venueUniId:"u1",
+    rules:["Старт з місця за сигналом судді","Коло зараховується після проходження всіх воріт","Пропущені ворота — штраф +2 секунди","У залік іде найкраще коло з урахуванням штрафів","До заїзду допускаються лише машини, що пройшли техком"]};
+  return{event,universities,builds,suppliers,announcements,votes,teams,laps};
+}
+
+/* ============ data layer ============ */
+const localApi={
+  add(c,x){state[c].push({...x,id:c[0]+Date.now()});render();return Promise.resolve()},
+  set(c,id,x){const i=state[c].findIndex(e=>e.id===id);i<0?state[c].push({...x,id}):state[c][i]={...x,id};render();return Promise.resolve()},
+  update(c,id,p){Object.assign(state[c].find(e=>e.id===id)||{},p);render();return Promise.resolve()},
+  del(c,id){state[c]=state[c].filter(e=>e.id!==id);render();return Promise.resolve()},
+  setEvent(e){state.event=e;render();return Promise.resolve()}
+};
+let api=localApi;
+function liveApi(db){
+  const fail=e=>{console.warn(e);setLive(false,"Немає синхронізації")};
+  db.doc("event/current").onSnapshot(s=>{state.event=s.exists?s.data():null;render()},fail);
+  COLS.forEach(c=>db.collection(c).limit(1000).onSnapshot(q=>{state[c]=q.docs.map(x=>({id:x.id,...x.data()}));render()},fail));
+  return{
+    add:(c,x)=>db.collection(c).add(x),
+    set:(c,id,x)=>db.doc(c+"/"+id).set(x),
+    update:(c,id,p)=>db.doc(c+"/"+id).update(p),
+    del:(c,id)=>db.doc(c+"/"+id).delete(),
+    setEvent:e=>db.doc("event/current").set(e)
+  };
+}
+async function write(p,msg){try{await p;if(msg)toast(msg);return true}catch(e){toast(e&&e.code==="not_granted"?"Немає прав на зміни в цьому демо":"Не вдалося зберегти, спробуйте ще раз");return false}}
+function setLive(){}
+
+/* ============ derived ============ */
+function voteCounts(){const m={};state.universities.forEach(u=>m[u.id]=0);state.votes.forEach(v=>{if(v.uniId in m)m[v.uniId]++});return m}
+function standings(){
+  return state.teams.map(t=>{const ls=state.laps.filter(l=>l.teamId===t.id),tot=ls.map(l=>l.ms+(l.penaltyMs||0));
+    return{t,n:ls.length,best:tot.length?Math.min(...tot):null,pen:ls.reduce((s,l)=>s+(l.penaltyMs||0),0)}}).filter(r=>r.n).sort((a,b)=>a.best-b.best);
+}
+const upcoming=()=>state.announcements.filter(a=>daysTo(a.date)>=0).sort((a,b)=>a.date.localeCompare(b.date));
+const statusTag=s=>s==="registration"?`<span class="tag"><span>Реєстрація відкрита</span></span>`:s==="vote"?`<span class="tag ink"><span>Голосування за трасу</span></span>`:`<span class="tag soft"><span>Незабаром</span></span>`;
+
+/* ============ views ============ */
+function vHome(){
+  const next=upcoming().find(a=>a.venueUniId)||upcoming()[0];
+  const u=next&&uni(next.venueUniId);
+  const vc=voteCounts(),total=state.votes.length,vRows=Object.entries(vc).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const voteAnn=state.announcements.find(a=>a.status==="vote");
+  const latest=[...state.builds].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,3);
+  const makers=state.suppliers.filter(s=>s.verified).length+state.universities.filter(u=>u.manufacture).length;
+  return`${next?`<section class="hero">
+    <div>
+      ${statusTag(next.status)}
+      <h1 style="margin-top:18px">${esc(next.title)}</h1>
+      <p class="lede">${esc(next.body)}</p>
+      <div class="when"><div><small>Дата</small><b>${dateParts(next.date).full}</b></div><div><small>Клас</small><b>${esc(next.cls)}</b></div><div><small>Траса</small><b>${u?esc(u.track.name):"обирається"}</b></div></div>
+      <div class="actions"><button class="btn red" data-go="race" data-race="teams"><span class="chev">Зареєструвати команду</span></button><button class="btn" data-go="news"><span>Усі анонси</span></button></div>
+    </div>
+    <div class="trackbox">
+      <div class="count">${Math.max(0,daysTo(next.date))}<small>${plural(Math.max(0,daysTo(next.date)),"день","дні","днів")} до старту${u?` · ${esc(u.name)}, ${esc(u.city)}`:""}</small></div>
+      ${trackSVG(u,{big:true})}
+    </div></section>`:""}
+  <div class="kerb" aria-hidden="true"></div>
+  <div class="stats"><div><b>${state.universities.length}</b><span>університетів із власними трасами</span></div><div><b>${state.builds.length}</b><span>відкритих конструкторів</span></div><div><b>${makers}</b><span>перевірених постачальників і виробників</span></div></div>
+  <div class="cols">
+    <section><div class="head"><h2 class="sec-title">Де наступний заїзд?</h2></div>
+      <p class="muted" style="margin:-12px 0 8px">${voteAnn?esc(voteAnn.title)+" · ":""}${total} ${plural(total,"голос","голоси","голосів")}</p>
+      ${vRows.map(([id,n],i)=>{const x=uni(id);return x?`<div class="vote-row ${i===0&&n>0?"lead":""}"><span><b>${esc(x.track.name)}</b> <span class="muted">· ${esc(x.city)}</span></span><span class="mono">${total?Math.round(n/total*100):0}%</span><div class="vb"><i style="width:${total?n/total*100:0}%"></i></div></div>`:""}).join("")}
+      <div class="actions"><button class="btn ink" data-go="tracks"><span class="chev">Голосувати за трасу</span></button></div>
+    </section>
+    <section><div class="head"><h2 class="sec-title">Оновлені конструктори</h2></div>
+      ${latest.map(b=>{const x=uni(b.uniId);return`<div class="vote-row" style="grid-template-columns:minmax(0,1fr) auto"><span><b>${esc(b.name)}</b> <span class="ver">v${b.version||1}</span><br><span class="muted" style="font-size:14px">${esc(x?x.name:"")} · ${esc(b.cls)}</span></span><button class="link" data-go="builds">Відкрити</button></div>`}).join("")||`<p class="empty">Ще немає конструкторів</p>`}
+    </section>
+  </div>`;
+}
+
+function vNews(){
+  const list=[...state.announcements].sort((a,b)=>a.date.localeCompare(b.date));
+  return`<div class="head"><div><h1>Анонси змагань</h1><p class="lede">Етапи ліги, дати, класи машин і траси. Реєстрація і техком відкриваються тут же.</p></div></div>
+  ${list.map(a=>{const p=dateParts(a.date),u=uni(a.venueUniId);return`<article class="ann">
+    <div class="date"><b>${p.day}</b><span>${p.mon} ${a.date.slice(0,4)}</span></div>
+    <div>${statusTag(a.status)}<h3>${esc(a.title)}</h3><div class="muted" style="font-size:14px">${esc(a.cls)} · ${u?`${esc(u.track.name)}, ${esc(u.city)}`:"траса визначається голосуванням"}</div><p style="margin:8px 0 0;max-width:62ch">${esc(a.body)}</p></div>
+    <div class="act">${a.status==="registration"?`<button class="btn red" data-go="race" data-race="teams"><span class="chev">Реєстрація</span></button>`:a.status==="vote"?`<button class="btn ink" data-go="tracks"><span class="chev">Голосувати</span></button>`:`<button class="btn" data-go="tracks"><span>Про трасу</span></button>`}</div>
+  </article>`}).join("")||`<p class="empty">Анонсів поки немає</p>`}`;
+}
+
+function vTracks(){
+  const vc=voteCounts(),total=state.votes.length,mine=(state.votes.find(v=>v.id===uid)||{}).uniId;
+  const voteAnn=state.announcements.find(a=>a.status==="vote");
+  const max=Math.max(0,...Object.values(vc));
+  return`<div class="head"><div><h1>Траси університетів</h1><p class="lede">Кожен університет проєктує власну трасу. ${voteAnn?`Зараз обираємо місце для етапу «${esc(voteAnn.title)}» — один голос на людину, його можна змінити.`:""}</p></div>
+  <div class="mono muted">${total} ${plural(total,"голос","голоси","голосів")}</div></div>
+  <div class="g3">${[...state.universities].sort((a,b)=>(a.order||0)-(b.order||0)).map(u=>{const n=vc[u.id]||0,pct=total?Math.round(n/total*100):0,isMine=mine===u.id,lead=n>0&&n===max;
+    return`<article class="card cut track-card ${isMine?"mine":""}">
+      <div class="top"><div><h3>${esc(u.track.name)}</h3><div class="muted" style="font-size:13px">${esc(u.name)} · ${esc(u.city)}</div></div>${lead?`<span class="tag"><span>Лідер</span></span>`:""}</div>
+      ${trackSVG(u)}
+      <div class="spec"><span>Довжина <b>${u.track.lengthM} м</b></span><span>Поворотів <b>${u.track.turns}</b></span></div>
+      <div class="vote-row ${lead?"lead":""}" style="border:0;padding:4px 0"><span class="muted" style="font-size:13px">${n} ${plural(n,"голос","голоси","голосів")}</span><span class="mono">${pct}%</span><div class="vb"><i style="width:${pct}%"></i></div></div>
+      <div>${isMine?`<button class="btn sm" disabled><span>Ваш голос</span></button>`:`<button class="btn ${mine?"":"red"} sm" data-a="vote" data-id="${esc(u.id)}"><span>${mine?"Змінити голос":"Голосувати"}</span></button>`}</div>
+    </article>`}).join("")}</div>`;
+}
+
+function buildForm(){
+  const b=ui.editBuild==="new"?{name:"",uniId:state.universities[0]?.id||"",cls:"Міні-боліди 1:10",mass:"",motor:"",battery:"",drive:"",sensors:"",license:"Відкрита",desc:""}:state.builds.find(x=>x.id===ui.editBuild);
+  if(!b)return"";const F="build";
+  const inp=(f,l,type="text")=>`<div><label for="f_b_${f}">${l}</label><input id="f_b_${f}" data-form="${F}" data-f="${f}" type="${type}" ${type==="number"?'step="0.01" min="0"':""} value="${esc(d(F,f,b[f]))}"></div>`;
+  return`<section class="panel" style="margin-bottom:28px"><h2 class="sec-title">${ui.editBuild==="new"?"Новий конструктор":`Редагування: ${esc(b.name)} · v${b.version||1}`}</h2>
+    <div class="row">${inp("name","Назва машини")}<div><label for="f_b_uniId">Університет</label><select id="f_b_uniId" data-form="${F}" data-f="uniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"uniId",b.uniId)===u.id?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>
+    <div><label for="f_b_cls">Клас</label><select id="f_b_cls" data-form="${F}" data-f="cls">${Object.keys(CLASSES).map(c=>`<option ${d(F,"cls",b.cls)===c?"selected":""}>${c}</option>`).join("")}</select></div></div>
+    <div class="row">${inp("mass","Маса, кг","number")}${inp("motor","Мотор")}${inp("battery","Батарея")}</div>
+    <div class="row">${inp("drive","Привід")}${inp("sensors","Датчики")}<div><label for="f_b_license">Доступ до креслень</label><select id="f_b_license" data-form="${F}" data-f="license">${["Відкрита","За запитом"].map(o=>`<option ${d(F,"license",b.license)===o?"selected":""}>${o}</option>`).join("")}</select></div></div>
+    ${ui.editBuild!=="new"?`<div><label for="f_b_note">Що змінилось у цій версії</label><input id="f_b_note" data-form="${F}" data-f="note" value="${esc(d(F,"note",""))}"></div>`:""}
+    <div class="actions"><button class="btn red" data-a="save-build"><span>${ui.editBuild==="new"?"Опублікувати конструктор":`Зберегти як v${(b.version||1)+1}`}</span></button><button class="btn" data-a="cancel-build"><span>Скасувати</span></button></div>
+  </section>`;
+}
+function vBuilds(){
+  const f=ui.buildFilter,list=state.builds.filter(b=>f==="all"||b.cls===f).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  return`<div class="head"><div><h1>Конструктори</h1><p class="lede">Університети публікують свої машини: специфікації, версії, доступ до креслень. Беріть за основу, покращуйте, випускайте нову версію.</p></div>
+  ${ui.editBuild?"":`<button class="btn red" data-a="new-build"><span>Додати конструктор</span></button>`}</div>
+  ${ui.editBuild?buildForm():""}
+  <div class="chips" style="margin-bottom:24px">${["all",...Object.keys(CLASSES)].map(c=>`<button class="chip" aria-pressed="${f===c}" data-a="bfilter" data-v="${esc(c)}">${c==="all"?"Усі класи":esc(c)}</button>`).join("")}</div>
+  <div class="g3">${list.map(b=>{const u=uni(b.uniId);return`<article class="card cut build">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><h3 style="font-size:22px">${esc(b.name)}</h3><div class="muted" style="font-size:13px">${esc(u?u.name:"")}</div></div><span class="ver">v${b.version||1}</span></div>
+    <span class="tag soft" style="align-self:flex-start"><span>${esc(b.cls)}</span></span>
+    <dl><dt>Маса</dt><dd class="mono">${esc(b.mass)} кг</dd><dt>Мотор</dt><dd>${esc(b.motor)}</dd><dt>Батарея</dt><dd>${esc(b.battery)}</dd><dt>Привід</dt><dd>${esc(b.drive)}</dd><dt>Датчики</dt><dd>${esc(b.sensors)}</dd><dt>Креслення</dt><dd>${esc(b.license)}</dd></dl>
+    ${b.note?`<p style="margin:0;font-size:13px"><span class="muted">Остання зміна:</span> ${esc(b.note)}</p>`:""}
+    <div class="foot"><span class="muted">Оновлено ${b.updatedAt?new Date(b.updatedAt).toLocaleDateString("uk-UA"):"—"}</span><button class="btn sm" data-a="edit-build" data-id="${esc(b.id)}"><span>Редагувати</span></button></div>
+  </article>`}).join("")||`<p class="empty">У цьому класі ще немає конструкторів. Додайте перший.</p>`}</div>`;
+}
+
+function vMakers(){
+  const f=ui.makerFilter;
+  const items=[...state.suppliers.map(s=>({...s,kind:"supplier"})),...state.universities.filter(u=>u.manufacture).map(u=>({id:u.id,name:u.name,city:u.city,category:"Університет-виробник",offers:u.capabilities,verified:u.verified,kind:"uni"}))]
+    .filter(x=>f==="all"||x.kind===f).sort((a,b)=>(b.verified-a.verified)||a.name.localeCompare(b.name,"uk"));
+  return`<div class="head"><div><h1>Постачальники і виробники</h1><p class="lede">Компанії та університетські лабораторії, які постачають компоненти й виготовляють деталі під регламент ліги. Позначка означає, що LovkoTech перевірив виробника.</p></div></div>
+  <div class="chips" style="margin-bottom:24px">${[["all","Усі"],["supplier","Постачальники"],["uni","Університети-виробники"]].map(([v,l])=>`<button class="chip" aria-pressed="${f===v}" data-a="mfilter" data-v="${v}">${l}</button>`).join("")}</div>
+  <div class="g3">${items.map(x=>`<article class="card cut" style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;gap:10px"><h3>${esc(x.name)}</h3>${x.verified?`<span class="verified">${verifiedMark}Перевірено</span>`:`<span class="pending">На перевірці</span>`}</div>
+    <div class="muted" style="font-size:13px">${esc(x.category)} · ${esc(x.city)}</div>
+    <p style="margin:0;font-size:14px">${esc(x.offers)}</p>
+    <div style="margin-top:auto;padding-top:8px"><button class="btn sm" data-a="contact" data-name="${esc(x.name)}"><span>${x.kind==="uni"?"Замовити деталь":"Запросити пропозицію"}</span></button></div>
+  </article>`).join("")||`<p class="empty">Нікого не знайдено</p>`}</div>`;
+}
+
+/* ---- race ---- */
+function vRules(){
+  const e=state.event;
+  if(ui.editEvent||!e){const x=e||{name:"",cls:"Міні-боліди 1:10",date:"",venueUniId:"",rules:[]},F="event";
+    return`<section class="panel"><h2 class="sec-title">${e?"Редагувати етап":"Новий етап"}</h2>
+    <div class="row"><div><label for="f_e_name">Назва етапу</label><input id="f_e_name" data-form="${F}" data-f="name" value="${esc(d(F,"name",x.name))}"></div>
+    <div><label for="f_e_cls">Клас</label><select id="f_e_cls" data-form="${F}" data-f="cls">${Object.keys(CLASSES).map(c=>`<option ${d(F,"cls",x.cls)===c?"selected":""}>${c}</option>`).join("")}</select></div></div>
+    <div class="row"><div><label for="f_e_date">Дата</label><input id="f_e_date" type="date" data-form="${F}" data-f="date" value="${esc(d(F,"date",x.date))}"></div>
+    <div><label for="f_e_venue">Траса</label><select id="f_e_venue" data-form="${F}" data-f="venueUniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"venueUniId",x.venueUniId)===u.id?"selected":""}>${esc(u.track.name)} — ${esc(u.city)}</option>`).join("")}</select></div></div>
+    <label for="f_e_rules">Регламент — одне правило в рядку</label><textarea id="f_e_rules" data-form="${F}" data-f="rules">${esc(d(F,"rules",(x.rules||[]).join("\n")))}</textarea>
+    <div class="actions"><button class="btn red" data-a="save-event"><span>Опублікувати</span></button>${e?`<button class="btn" data-a="cancel-event"><span>Скасувати</span></button>`:""}</div></section>`}
+  const u=uni(e.venueUniId),lim=(CLASSES[e.cls]||{}).mass;
+  return`<div class="head"><div><h1>${esc(e.name)}</h1><p class="lede">${esc(e.cls)} · ліміт маси ${lim} кг · ${e.date?dateParts(e.date).full:""}${u?` · ${esc(u.track.name)}, ${esc(u.city)}`:""}</p></div><button class="btn notkiosk" data-a="edit-event"><span>Редагувати</span></button></div>
+  <div class="cols"><div>${trackSVG(u,{big:true})}${u?`<p class="muted" style="font-size:13px">${u.track.lengthM} м · ${u.track.turns} поворотів · червоним позначено перший сектор</p>`:""}</div>
+  <div><h2 class="sec-title" style="margin-bottom:12px">Регламент</h2><ol class="rules">${(e.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ol></div></div>`;
+}
+function vTeams(){
+  const e=state.event,lim=e&&CLASSES[e.cls]?CLASSES[e.cls].mass:null,F="team";
+  return`<div class="head"><div><h1>Команди і техком</h1><p class="lede">Паспорт машини та чек-лист допуску. Суддя бачить лише допущені команди.</p></div></div>
+  <div class="g3" style="margin-bottom:32px">${state.teams.map(t=>{const ok=admitted(t),n=CHECKS.filter(([k])=>t.checks&&t.checks[k]).length,u=uni(t.uniId),b=state.builds.find(x=>x.id===t.buildId),over=lim!=null&&+t.mass>lim;
+    return`<article class="card team ${ok?"ok":""}"><h3 style="font-size:19px">${esc(t.name)}</h3><div class="muted" style="font-size:13px;margin-bottom:10px">${esc(u?u.name:"")}${b?` · ${esc(b.name)} v${b.version||1}`:""}</div>
+    <div class="mono" style="font-size:13px;margin-bottom:8px">${esc(t.mass)} кг · ${esc(t.volt)} В</div>${over?`<div class="warn">Маса перевищує ліміт класу (${lim} кг)</div>`:""}
+    ${CHECKS.map(([k,l])=>`<label class="check"><input type="checkbox" data-a="check" data-id="${esc(t.id)}" data-k="${k}" ${t.checks&&t.checks[k]?"checked":""}>${l}</label>`).join("")}
+    <div class="${ok?"state-ok":"state-wait"}" style="margin-top:10px">${ok?"Допущено до заїздів":`Техком: ${n} з ${CHECKS.length}`}</div></article>`}).join("")||`<p class="empty">Команд ще немає</p>`}</div>
+  <section class="panel"><h2 class="sec-title">Реєстрація команди</h2>
+    <div class="row"><div><label for="f_t_name">Назва команди</label><input id="f_t_name" data-form="${F}" data-f="name" value="${esc(d(F,"name",""))}"></div>
+    <div><label for="f_t_uni">Університет</label><select id="f_t_uni" data-form="${F}" data-f="uniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"uniId","")===u.id?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>
+    <div><label for="f_t_build">Конструктор</label><select id="f_t_build" data-form="${F}" data-f="buildId"><option value="">Власна розробка</option>${state.builds.map(b=>`<option value="${esc(b.id)}" ${d(F,"buildId","")===b.id?"selected":""}>${esc(b.name)} v${b.version||1}</option>`).join("")}</select></div></div>
+    <div class="row"><div><label for="f_t_mass">Маса, кг</label><input id="f_t_mass" type="number" step="0.01" min="0" data-form="${F}" data-f="mass" value="${esc(d(F,"mass",""))}"></div>
+    <div><label for="f_t_volt">Напруга батареї, В</label><input id="f_t_volt" type="number" step="0.1" min="0" data-form="${F}" data-f="volt" value="${esc(d(F,"volt",""))}"></div></div>
+    <div class="actions"><button class="btn red" data-a="add-team"><span>Зареєструвати команду</span></button></div></section>`;
+}
+function vJudge(){
+  const recent=[...state.laps].sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,8);
+  return`<div class="head"><div><h1>Пульт судді</h1><p class="lede">Секундомір або ручне введення. Кожне коло одразу з'являється на табло.</p></div></div>
+  <div class="cols"><section class="panel">
+    <label for="j_team">Команда на трасі</label><select id="j_team"><option value="">Оберіть команду</option>${state.teams.map(t=>`<option value="${esc(t.id)}" ${admitted(t)?"":"disabled"} ${t.id===judge.team?"selected":""}>${esc(t.name)}${admitted(t)?"":" — не допущена"}</option>`).join("")}</select>
+    <div class="clock mono ${judge.running?"run":""}" id="clock">${judge.running?fmt(Math.round(performance.now()-judge.start)):"0:00.000"}</div>
+    <div class="actions" style="margin-top:0"><button class="btn red" data-a="${judge.running?"lap":"start"}" ${judge.team?"":"disabled"}><span>${judge.running?"Фініш кола":"Старт"}</span></button><button class="btn" data-a="stop" ${judge.running?"":"disabled"}><span>Стоп</span></button><button class="btn" data-a="pen" ${judge.running?"":"disabled"}><span>+2 с ворота</span></button></div>
+    <p>Штраф на цьому колі: <b class="mono" id="penv">${judge.pen/1000} с</b></p>
+    <label for="f_manual">Або введіть час вручну (м:сс.ттт)</label>
+    <div class="row"><input id="f_manual" class="mono" placeholder="0:42.310"><button class="btn" style="flex:0 0 auto" data-a="manual" ${judge.team?"":"disabled"}><span>Додати коло</span></button></div>
+  </section>
+  <section><h2 class="sec-title" style="margin-bottom:8px">Останні кола</h2>${recent.length?`<ul class="laps">${recent.map(l=>{const t=state.teams.find(x=>x.id===l.teamId);return`<li><span>${esc(t?t.name:"?")}</span><span class="mono">${fmt(l.ms)}${l.penaltyMs?` +${l.penaltyMs/1000} с`:""}</span><button class="link" data-a="del-lap" data-id="${esc(l.id)}">Скасувати</button></li>`}).join("")}</ul>`:`<p class="empty">Ще немає кіл</p>`}</section></div>`;
+}
+function vBoard(){
+  const rows=standings(),lead=rows[0]?.best,e=state.event,u=e&&uni(e.venueUniId);
+  return`<div class="head"><div><h1>Табло</h1><p class="lede">${e?`${esc(e.name)} · ${esc(e.cls)}${u?` · ${esc(u.track.name)}`:""}`:""}</p></div><button class="btn" data-a="kiosk"><span>${document.body.classList.contains("kiosk")?"Вийти з режиму глядача":"Режим глядача"}</span></button></div>
+  <div class="kerb" aria-hidden="true"></div>
+  <div class="tower"><div class="scroll"><table><tr><th>Поз.</th><th>Команда</th><th>Найкраще коло</th><th>Відрив</th><th>Кіл</th><th>Штрафи</th></tr>
+  ${rows.map((r,i)=>{const x=uni(r.t.uniId);return`<tr class="${i===0?"p1":""} ${r.t.id===flashTeam?"flash":""}"><td class="pos"><span><b>${i+1}</b></span></td><td class="tname">${esc(r.t.name)}<small>${esc(x?x.name:"")}</small></td>
+    <td class="mono ${i===0?"fastest":""}">${fmt(r.best)}</td><td class="mono">${i===0?"Лідер":"+"+((r.best-lead)/1000).toFixed(3)}</td><td class="mono">${r.n}</td><td class="mono">${r.pen?"+"+r.pen/1000+" с":"—"}</td></tr>`}).join("")||`<tr><td colspan="6" class="empty">Заїзди ще не почались</td></tr>`}
+  </table></div></div>
+  <p class="muted" style="font-size:13px">Найкраще коло з урахуванням штрафів. Фіолетовим — найшвидше коло етапу. Рядок підсвічується, коли команда проїжджає нове коло.</p>`;
+}
+function vRace(){
+  const tabs=[["rules","Регламент і траса"],["teams","Техком"],["judge","Суддя"],["board","Табло"]];
+  return`<div class="subnav" role="tablist">${tabs.map(([k,l])=>`<button data-race="${k}" aria-current="${ui.race===k}">${l}</button>`).join("")}</div>
+  ${ui.race==="rules"?vRules():ui.race==="teams"?vTeams():ui.race==="judge"?vJudge():vBoard()}`;
+}
+
+/* ============ render ============ */
+function render(){
+  const newest=state.laps.reduce((a,l)=>!a||(l.at||0)>(a.at||0)?l:a,null);
+  if(newest&&lastLap&&newest.id!==lastLap){flashTeam=newest.teamId;setTimeout(()=>{flashTeam=null},2600)}
+  if(newest)lastLap=newest.id;
+  document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.go===ui.view?"page":"false"));
+  const a=document.activeElement;
+  if(a&&a.id&&a.id.startsWith("f_")&&document.getElementById("main").contains(a)){render.pending=true;return}
+  render.pending=false;
+  $("#main").innerHTML=({home:vHome,news:vNews,tracks:vTracks,builds:vBuilds,makers:vMakers,race:vRace}[ui.view]||vHome)();
+}
+function tick(){if(!judge.running)return;const c=$("#clock");if(c)c.textContent=fmt(Math.round(performance.now()-judge.start));judge.raf=requestAnimationFrame(tick)}
+function go(v,race){ui.view=v;if(race)ui.race=race;ui.editBuild=null;ui.editEvent=false;saveUi();document.body.classList.remove("kiosk");render();window.scrollTo(0,0)}
+
+/* ============ events ============ */
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.form){(drafts[t.dataset.form]??={})[t.dataset.f]=t.value}});
+document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(render.pending&&!(a&&a.id&&a.id.startsWith("f_")))render()},0));
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.form){(drafts[t.dataset.form]??={})[t.dataset.f]=t.value}
+  if(t.dataset.a==="check"){const tm=state.teams.find(x=>x.id===t.dataset.id);if(tm)write(api.update("teams",tm.id,{checks:{...(tm.checks||{}),[t.dataset.k]:t.checked}}))}
+  if(t.id==="j_team"){judge.team=t.value;if(judge.running){judge.running=false;cancelAnimationFrame(judge.raf)}render()}
+});
+document.addEventListener("click",async e=>{
+  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go,g.dataset.race);return}
+  const r=e.target.closest("[data-race]");if(r){ui.race=r.dataset.race;ui.editEvent=false;saveUi();render();return}
+  const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;const a=b.dataset.a;
+  if(a==="vote"){await write(api.set("votes",uid,{uniId:b.dataset.id,at:Date.now()}),"Голос зараховано")}
+  else if(a==="bfilter"){ui.buildFilter=b.dataset.v;saveUi();render()}
+  else if(a==="mfilter"){ui.makerFilter=b.dataset.v;saveUi();render()}
+  else if(a==="new-build"){ui.editBuild="new";delete drafts.build;render()}
+  else if(a==="edit-build"){ui.editBuild=b.dataset.id;delete drafts.build;render();window.scrollTo({top:0,behavior:"smooth"})}
+  else if(a==="cancel-build"){ui.editBuild=null;delete drafts.build;render()}
+  else if(a==="save-build"){
+    const isNew=ui.editBuild==="new",old=isNew?{}:state.builds.find(x=>x.id===ui.editBuild)||{},dr=drafts.build||{};
+    const pick=k=>(k in dr?dr[k]:old[k])??"";
+    const x={name:String(pick("name")).trim(),uniId:pick("uniId")||state.universities[0]?.id,cls:pick("cls")||"Міні-боліди 1:10",mass:+pick("mass")||0,motor:pick("motor"),battery:pick("battery"),drive:pick("drive"),sensors:pick("sensors"),license:pick("license")||"Відкрита",desc:old.desc||"",
+      version:isNew?1:(old.version||1)+1,note:isNew?"Перша версія":(dr.note||"Оновлено специфікацію"),updatedAt:Date.now()};
+    if(!x.name){toast("Вкажіть назву машини");return}
+    const ok=await write(isNew?api.add("builds",x):api.set("builds",ui.editBuild,x),isNew?"Конструктор опубліковано":`Збережено як v${x.version}`);
+    if(ok){ui.editBuild=null;delete drafts.build;render()}}
+  else if(a==="partner"){toast("Дякуємо! Заявку на партнерство надіслано")}
+  else if(a==="contact"){toast(`Запит надіслано: ${b.dataset.name}`)}
+  else if(a==="edit-event"){ui.editEvent=true;delete drafts.event;render()}
+  else if(a==="cancel-event"){ui.editEvent=false;delete drafts.event;render()}
+  else if(a==="save-event"){const o=state.event||{},dr=drafts.event||{},p=k=>k in dr?dr[k]:o[k];
+    const ev={name:String(p("name")||"Новий етап").trim(),cls:p("cls")||"Міні-боліди 1:10",date:p("date")||"",venueUniId:p("venueUniId")||state.universities[0]?.id||"",
+      rules:("rules" in dr?dr.rules.split("\n"):(o.rules||[])).map(s=>String(s).trim()).filter(Boolean)};
+    if(await write(api.setEvent(ev),"Етап опубліковано")){ui.editEvent=false;delete drafts.event;render()}}
+  else if(a==="add-team"){const dr=drafts.team||{};const name=(dr.name||"").trim();if(!name){toast("Вкажіть назву команди");return}
+    const t={name,uniId:dr.uniId||state.universities[0]?.id||"",buildId:dr.buildId||"",mass:+dr.mass||0,volt:+dr.volt||0,createdAt:Date.now(),checks:{mass:false,estop:false,battery:false,sensors:false}};
+    if(await write(api.add("teams",t),"Команду зареєстровано")){delete drafts.team;render()}}
+  else if(a==="start"){judge.start=performance.now();judge.running=true;judge.pen=0;render();tick()}
+  else if(a==="lap"){const ms=Math.round(performance.now()-judge.start),pen=judge.pen;judge.start=performance.now();judge.pen=0;
+    write(api.add("laps",{teamId:judge.team,ms,penaltyMs:pen,at:Date.now()}),`Коло ${fmt(ms)} записано`);render();tick()}
+  else if(a==="stop"){judge.running=false;cancelAnimationFrame(judge.raf);render()}
+  else if(a==="pen"){judge.pen+=PENALTY;const p=$("#penv");if(p)p.textContent=judge.pen/1000+" с"}
+  else if(a==="manual"){const inp=$("#f_manual"),ms=parseTime(inp.value);if(ms==null||ms<=0){toast("Формат часу: 0:42.310");return}
+    inp.value="";inp.blur();await write(api.add("laps",{teamId:judge.team,ms,penaltyMs:0,at:Date.now()}),`Коло ${fmt(ms)} записано`)}
+  else if(a==="del-lap"){await write(api.del("laps",b.dataset.id),"Коло скасовано")}
+  else if(a==="kiosk"){document.body.classList.toggle("kiosk");render()}
+});
+
+/* ============ partners carousel ============ */
+const GLYPHS={
+  slant:'<path d="M6 2h10L10 22H0z" fill="currentColor"/><path d="M18 2h6l-6 20h-6z" fill="#E10600"/>',
+  ring:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="3.5" fill="#E10600"/>',
+  bolt:'<path d="M14 1L3 14h7l-2 9 11-13h-7z" fill="currentColor"/>',
+  hex:'<path d="M12 1l10 6v10l-10 6L2 17V7z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 7l5 3v4l-5 3-5-3v-4z" fill="#E10600"/>',
+  chevron:'<path d="M2 3h6l7 9-7 9H2l7-9z" fill="currentColor"/><path d="M12 3h6l7 9-7 9h-6l7-9z" fill="#E10600"/>',
+  delta:'<path d="M12 2l11 20H1z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 11l4 7H8z" fill="currentColor"/>'
+};
+const PARTNERS=[
+  ["VoltGrid","Генеральний партнер","bolt",true],
+  ["Nova Embedded","Технологічний партнер","hex"],
+  ["Steppe Dynamics","Партнер етапу","chevron"],
+  ["SkyForge Robotics","Партнер класу дронів","delta"],
+  ["Iron Delta","Партнер з виробництва","slant"],
+  ["Dnipro Motion","Партнер етапу","ring"],
+  ["Кіловат Компоненти","Постачальник ліги","bolt"],
+  ["PrintFab Дніпро","Виробничий партнер","hex"],
+  ["Фонд Інженерів","Грантовий партнер","ring"]
+];
+function renderPartners(){
+  const one=PARTNERS.map(([n,t,g,gold])=>`<div class="plogo ${gold?"gold":""}"><svg width="26" height="24" viewBox="0 0 26 24" aria-hidden="true">${GLYPHS[g]}</svg><div><b>${esc(n)}</b><small>${esc(t)}</small></div></div>`).join("");
+  $("#marquee").innerHTML=`<div class="marquee-track"><div style="display:flex">${one}</div><div style="display:flex" aria-hidden="true">${one}</div></div>`;
+}
+
+/* ============ boot ============ */
+renderPartners();
+try{uid=localStorage.getItem("pw2.uid")||("anon_"+Math.random().toString(36).slice(2,10));localStorage.setItem("pw2.uid",uid)}catch(e){uid="anon_"+Math.random().toString(36).slice(2,10)}
+Object.assign(state,demoData());
+render();
+if(window.claude&&window.claude.use){
+  window.claude.use("user").then(async u=>{if(u){try{const id=await u.id();if(id){uid=id;render()}}catch(e){}}}).catch(()=>{});
+  window.claude.use("db").then(db=>{if(!db)return;COLS.forEach(c=>state[c]=[]);state.event=null;lastLap=null;api=liveApi(db);setLive(true,"Live");render()}).catch(()=>{});
+}
+</script>
+</body>
+</html>
