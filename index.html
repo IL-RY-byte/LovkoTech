@@ -4,594 +4,897 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>LovkoTech — ліга університетських інженерних перегонів</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<title>LovkoTech — змагання і фестивалі з чесним суддівством</title>
+<meta name="description" content="Прототип платформи LovkoTech: регламент, реєстрація, суддівство з відкритим протоколом і рейтинг сезону для інженерних перегонів, латте-арт фестивалів, хакатонів і робототехніки.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'%3E%3Cpath d='M6 0h8L8 20H0z' fill='%23E10600'/%3E%3Cpath d='M17 0h13l-6 20H11z' fill='%2316161A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
   --bg:#FFFFFF;--surface:#F6F6F4;--surface2:#EDEDEA;--ink:#16161A;--ink2:#34343B;--muted:#5E5E66;--line:#E3E3DF;
-  --red:#E10600;--red-dark:#B00500;--on-red:#FFFFFF;--purple:#6A1FC9;--green:#0E7A3A;--amber:#8A5A00;
+  --red:#E10600;--red-dark:#B00500;--green:#0E7A3A;--amber:#8A5A00;--purple:#6A1FC9;--coffee:#7A4B2E;
+  --accent:var(--red);
   --display:'Unbounded','Arial Black',Arial,sans-serif;--text:'Manrope',Arial,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--text);-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip}
+.bar>.btn{margin-right:4px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--text);-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
 button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
 :focus-visible{outline:2px solid var(--red);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* prototype ribbon */
+.ribbon{background:var(--ink);color:#fff;font-size:13px}
+.ribbon .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;min-height:36px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.ribbon button{background:none;border:0;color:#fff;text-decoration:underline;cursor:pointer;font-size:13px;padding:0}
 
 /* header */
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:28px;height:64px}
-.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.2px;border:0;background:none;padding:0;cursor:pointer}
-.logo svg{flex:0 0 auto}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.2px;text-decoration:none}
 nav.main{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
 nav.main::-webkit-scrollbar{display:none}
-nav.main button{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap;position:relative}
-nav.main button[aria-current="page"]{color:var(--ink)}
-nav.main button[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-13px;height:3px;background:var(--red);transform:skewX(-20deg)}
-.live{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);white-space:nowrap}
-.live i{width:7px;height:7px;border-radius:50%;background:#B8B8B2}
-.live.on i{background:var(--red);animation:pulse 1.6s infinite}
-@keyframes pulse{50%{opacity:.35}}
-@media (max-width:760px){.bar{height:auto;flex-wrap:wrap;gap:8px 16px;padding:10px 0}nav.main{order:3;flex-basis:100%}nav.main button[aria-current="page"]::after{bottom:-6px}}
+nav.main a{padding:8px 12px;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap;position:relative;text-decoration:none}
+nav.main a[aria-current="page"]{color:var(--ink)}
+nav.main a[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-13px;height:3px;background:var(--red);transform:skewX(-20deg)}
+@media (max-width:760px){.bar{height:auto;flex-wrap:wrap;gap:8px 16px;padding:10px 0}nav.main{order:3;flex-basis:100%}nav.main a[aria-current="page"]::after{bottom:-6px}.bar .btn{margin-left:auto}}
 
-main{padding:40px 0 80px;min-height:70vh}
-h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.5px;margin:0;line-height:1.12}
+main{padding:36px 0 80px;min-height:70vh}
+h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.5px;margin:0;line-height:1.14}
 h1{font-size:clamp(30px,5vw,54px);text-wrap:balance}
 h2{font-size:clamp(22px,2.6vw,30px)}
 h3{font-size:17px;font-weight:500;letter-spacing:-.2px}
-.lede{color:var(--muted);max-width:62ch;margin:12px 0 0}
-.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+p{margin:0}
+.lede{color:var(--muted);max-width:64ch;margin-top:14px;font-size:17px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:24px}
 .sec-title{display:flex;align-items:center;gap:12px}
-.sec-title::before{content:"";width:6px;height:26px;background:var(--red);transform:skewX(-18deg);flex:0 0 auto}
+.sec-title::before{content:"";width:6px;height:26px;background:var(--accent);transform:skewX(-18deg);flex:0 0 auto}
+section+section{margin-top:56px}
 
 /* signature shapes */
 .kerb{height:8px;background:repeating-linear-gradient(90deg,var(--red) 0 28px,#fff 28px 56px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.tag{display:inline-block;background:var(--red);color:var(--on-red);font-size:12px;font-weight:700;padding:4px 12px;transform:skewX(-14deg);white-space:nowrap}
+.tag{display:inline-block;background:var(--accent);color:#fff;font-size:12px;font-weight:700;padding:4px 12px;transform:skewX(-14deg);white-space:nowrap}
 .tag>span{display:inline-block;transform:skewX(14deg)}
 .tag.ink{background:var(--ink)}.tag.soft{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.tag.live{background:var(--red)}.tag.live>span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:6px;animation:pulse 1.4s infinite;vertical-align:1px}
+@keyframes pulse{50%{opacity:.3}}
 .cut{clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%)}
 .card{background:var(--surface);padding:22px}
-.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:transparent;padding:10px 18px;cursor:pointer;font-weight:700;font-size:14px;transform:skewX(-10deg)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:transparent;padding:10px 18px;cursor:pointer;font-weight:700;font-size:14px;transform:skewX(-10deg);text-decoration:none;white-space:nowrap}
 .btn>span{display:inline-block;transform:skewX(10deg)}
-.btn.red{background:var(--red);border-color:var(--red);color:var(--on-red)}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
 .btn.red:hover{background:var(--red-dark);border-color:var(--red-dark)}
 .btn.ink{background:var(--ink);color:#fff}
-.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn.sm{padding:6px 12px;font-size:13px}
-.chev::after{content:"";display:inline-block;width:8px;height:8px;border-right:2px solid currentColor;border-top:2px solid currentColor;transform:rotate(45deg);margin-left:2px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.link{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px;padding:0}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:#fff;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.chip{border:1px solid var(--line);background:#fff;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-.verified{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--red)}
-.verified svg{flex:0 0 auto}
-.pending{font-size:12px;font-weight:700;color:var(--amber)}
-.muted{color:var(--muted)}
-.empty{color:var(--muted);padding:28px;text-align:center;background:var(--surface)}
+.fmt-dot{display:inline-block;width:10px;height:10px;transform:skewX(-14deg);background:var(--c,var(--red));margin-right:6px}
 
 /* hero */
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;padding:24px 0 40px}
-.hero .when{display:flex;gap:28px;margin:28px 0;flex-wrap:wrap}
-.hero .when div small{display:block;color:var(--muted);font-size:12px;font-weight:600}
-.hero .when div b{font-family:var(--display);font-weight:500;font-size:20px}
-.count{font-family:var(--display);font-weight:600;font-size:clamp(64px,9vw,112px);line-height:.9;letter-spacing:-3px}
-.count small{font-family:var(--text);font-size:14px;letter-spacing:0;font-weight:600;color:var(--muted);display:block;margin-top:6px}
-.trackbox{position:relative}
-.trackbox .tlabel{position:absolute;left:0;bottom:0;font-size:12px;color:var(--muted)}
-@media (max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:8px 0 56px}
-.stats div{padding:22px 0}.stats div+div{border-left:1px solid var(--line);padding-left:24px}
-.stats b{font-family:var(--display);font-weight:500;font-size:34px;display:block}
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center;padding:12px 0 8px}
+.hero .actions{margin-top:28px}
+@media (max-width:900px){.hero{grid-template-columns:minmax(0,1fr)}}
+.livecard{background:var(--ink);color:#fff;padding:26px;position:relative}
+.livecard .t{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}
+.livecard h3{font-size:20px}
+.livecard ol{list-style:none;margin:0;padding:0}
+.livecard li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #2C2C33}
+.livecard li b.p{font-family:var(--display);font-weight:600;color:#9A9AA4}
+.livecard li:first-child b.p{color:#FF5A4E}
+.livecard .sc{font-family:var(--mono);font-size:17px}
+.livecard small{color:#A9A9B2}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:40px}
+.stats div{padding:20px 0}.stats div+div{border-left:1px solid var(--line);padding-left:24px}
+.stats b{font-family:var(--display);font-weight:500;font-size:32px;display:block}
 .stats span{color:var(--muted);font-size:14px}
-@media (max-width:560px){.stats{grid-template-columns:1fr}.stats div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)}}
-.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
-@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(3){border-left:0;padding-left:0}.stats div:nth-child(n+3){border-top:1px solid var(--line)}}
 
-/* vote bars */
-.vote-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
-.vote-row .vb{grid-column:1/-1;height:6px;background:var(--surface2)}
-.vote-row .vb i{display:block;height:100%;background:var(--ink);transform-origin:left;transition:width .5s}
-.vote-row.lead .vb i{background:var(--red)}
+/* formats */
+.formats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:980px){.formats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.formats{grid-template-columns:minmax(0,1fr)}}
+.fmt{display:flex;flex-direction:column;gap:12px;padding:22px;background:var(--surface);text-decoration:none;border-top:4px solid var(--c);transition:transform .15s}
+.fmt:hover{transform:translateY(-2px)}
+.fmt .ic{width:44px;height:44px;display:grid;place-items:center;background:#fff;color:var(--c)}
+.fmt p{color:var(--muted);font-size:14px}
+.fmt .n{margin-top:auto;font-size:13px;font-weight:700}
+.fmt.new{border-top-color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
 
-/* grids */
-.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
-.track-card{display:flex;flex-direction:column;gap:10px}
-.track-card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.track-card .spec{display:flex;gap:18px;font-size:13px;color:var(--muted)}
-.track-card .spec b{color:var(--ink);font-family:var(--mono);font-weight:500}
-.track-card.mine{outline:2px solid var(--red);outline-offset:-2px}
-.build{display:flex;flex-direction:column;gap:12px}
-.build dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
-.build dt{color:var(--muted)}.build dd{margin:0}
-.build .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:13px}
-.ver{font-family:var(--mono);font-size:12px;border:1px solid var(--ink);padding:1px 6px}
+/* events */
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.ev{display:flex;flex-direction:column;gap:12px;padding:22px;background:var(--surface);text-decoration:none;border-left:4px solid var(--c)}
+.ev:hover{background:var(--surface2)}
+.ev .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.ev h3{font-size:19px}
+.ev .meta{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.ev .foot{margin-top:auto;display:flex;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;font-weight:600}
+.status{font-size:12px;font-weight:700}
+.st-live{color:var(--red)}.st-registration{color:var(--green)}.st-announced{color:var(--amber)}.st-finished{color:var(--muted)}
 
-/* announcements */
-.ann{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:24px;align-items:center;padding:24px 0;border-bottom:1px solid var(--line)}
-.ann .date b{font-family:var(--display);font-weight:500;font-size:44px;line-height:1;display:block}
-.ann .date span{font-size:13px;font-weight:600;color:var(--muted)}
-.ann h3{font-size:20px;margin:8px 0 4px}
-@media (max-width:640px){.ann{grid-template-columns:80px minmax(0,1fr)}.ann .act{grid-column:1/-1}}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+.steps div{padding:22px 22px 22px 0}
+.steps div+div{padding-left:22px;border-left:1px solid var(--line)}
+.steps b{font-family:var(--mono);color:var(--red);font-size:13px}
+.steps h3{margin:8px 0 6px}
+.steps p{color:var(--muted);font-size:14px}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}.steps div:nth-child(3){border-left:0;padding-left:0}.steps div:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}.steps div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)}}
+
+/* ethical standard */
+.ethic{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:36px;padding:32px;background:#F3F0FF;border:1px solid #DED6FF}
+.ethic h2{font-size:clamp(22px,2.4vw,28px)}
+.ethic .tagline{font-size:12px;font-weight:700;color:var(--purple);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.ethic ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:18px 28px}
+.ethic li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;font-size:14px}
+.ethic li b{display:block;font-size:15px;margin-bottom:2px}
+.ethic li svg{color:var(--purple);margin-top:2px}
+@media (max-width:860px){.ethic{grid-template-columns:minmax(0,1fr)}.ethic ul{grid-template-columns:1fr}}
+
+/* event page */
+.ehead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-bottom:26px}
+.ehead .crumbs{font-size:13px;color:var(--muted);margin-bottom:14px}
+.ehead .crumbs a{text-decoration:none}
+.ehead .meta{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;font-size:14px}
+.ehead .meta small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.ehead .meta b{font-weight:700}
+@media (max-width:760px){.ehead{grid-template-columns:minmax(0,1fr)}}
+.tabs{display:flex;gap:0;border:1px solid var(--line);width:max-content;max-width:100%;overflow-x:auto;margin-bottom:28px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{background:#fff;padding:10px 18px;font-weight:700;font-size:13px;white-space:nowrap;text-decoration:none}
+.tabs a+a{border-left:1px solid var(--line)}
+.tabs a[aria-current="true"]{background:var(--ink);color:#fff}
+.tabs a .cnt{font-family:var(--mono);font-weight:500;color:var(--red);margin-left:6px}
+.tabs a[aria-current="true"] .cnt{color:#FF8A80}
+.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:36px;align-items:start}
+.cols.even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:900px){.cols,.cols.even{grid-template-columns:minmax(0,1fr)}}
+.panel{border:1px solid var(--line);padding:24px;background:#fff}
+.panel+.panel{margin-top:20px}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.kv div{background:#fff;padding:16px 18px}
+.kv b{display:block;font-family:var(--display);font-weight:500;font-size:26px}
+.kv span{font-size:13px;color:var(--muted)}
+@media (max-width:520px){.kv{grid-template-columns:1fr 1fr}}
+
+/* lock / hash */
+.lock{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;background:#F3F0FF;border:1px solid #DED6FF;margin-bottom:18px}
+.lock svg{color:var(--purple);flex:0 0 auto;margin-top:2px}
+.lock b{display:block}
+.lock .h{font-family:var(--mono);font-size:13px;word-break:break-all}
+.ok-mark{color:var(--green);font-weight:700}
+.crit{list-style:none;margin:0;padding:0}
+.crit li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.crit li span{color:var(--muted);font-size:14px}
+.crit li b{font-family:var(--mono)}
 
 /* forms */
-.panel{border:1px solid var(--line);padding:24px;background:#fff}
 label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 6px}
 input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:0}
 input:focus,select:focus,textarea:focus{border-color:var(--ink);outline:none}
-textarea{min-height:90px;resize:vertical}
-.row{display:flex;gap:14px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
-.actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+textarea{min-height:84px;resize:vertical}
+.row{display:flex;gap:14px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;align-items:center}
+.check{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:14px;cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--ink)}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.warn{color:var(--red);font-size:13px;font-weight:600;margin-top:8px}
+.scoregrid{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px 14px;align-items:center;margin-top:10px}
+.scoregrid label{margin:0;font-size:14px;color:var(--ink);font-weight:600}
+.scoregrid label small{display:block;color:var(--muted);font-weight:500;font-size:12px}
 
-/* race */
-.subnav{display:flex;gap:0;border:1px solid var(--line);width:max-content;max-width:100%;overflow-x:auto;margin-bottom:28px}
-.subnav button{border:0;background:#fff;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
-.subnav button+button{border-left:1px solid var(--line)}
-.subnav button[aria-current="true"]{background:var(--ink);color:#fff}
-.team{border-left:4px solid var(--amber)}.team.ok{border-left-color:var(--green)}
-.check{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:14px;cursor:pointer}
-.check input{width:18px;height:18px;accent-color:var(--green);margin:0}
-.state-ok{color:var(--green);font-weight:700;font-size:13px}.state-wait{color:var(--amber);font-weight:700;font-size:13px}
-.warn{color:var(--red);font-size:13px;font-weight:600}
-.clock{font-size:clamp(52px,11vw,104px);font-weight:700;line-height:1;margin:18px 0;letter-spacing:-2px}
+/* participants */
+.plist{list-style:none;margin:0;padding:0}
+.plist li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.plist li b{font-weight:700}
+.plist li small{display:block;color:var(--muted);font-size:13px}
+.ok{color:var(--green);font-weight:700;font-size:13px}.wait{color:var(--amber);font-weight:700;font-size:13px}
+
+/* clock */
+.clock{font-size:clamp(52px,10vw,96px);font-weight:700;line-height:1;margin:14px 0;letter-spacing:-2px}
 .clock.run{color:var(--red)}
-.laps{list-style:none;margin:0;padding:0}
-.laps li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
-.link{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+
+/* results tower */
 .tower{border-top:3px solid var(--ink)}
-.tower table{width:100%;border-collapse:collapse}
 .scroll{overflow-x:auto}
-.tower th{text-align:left;font-size:12px;font-weight:700;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
-.tower td{padding:14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tower table{width:100%;border-collapse:collapse}
+.tower th{text-align:left;font-size:12px;font-weight:700;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tower td{padding:14px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+.tower td.num,.tower th.num{text-align:right}
 .pos{width:64px}
 .pos span{display:inline-flex;width:40px;height:32px;align-items:center;justify-content:center;background:var(--ink);color:#fff;font-family:var(--display);font-weight:600;transform:skewX(-12deg)}
 .pos span b{transform:skewX(12deg);font-weight:600}
 tr.p1 .pos span{background:var(--red)}
 .tname{font-family:var(--display);font-weight:500;font-size:16px}
 .tname small{display:block;font-family:var(--text);font-size:12px;color:var(--muted);font-weight:500}
-.fastest{color:var(--purple);font-weight:700}
-.flash td{animation:fl 2.4s ease-out}
-@keyframes fl{0%,40%{background:#FFF0EF}100%{background:transparent}}
-body.kiosk header,body.kiosk .subnav,body.kiosk footer,body.kiosk .notkiosk{display:none}
-body.kiosk .tower td{font-size:22px;padding:20px 16px}body.kiosk .tname{font-size:24px}
-.rules{margin:0;padding:0;list-style:none;counter-reset:r}
-.rules li{counter-increment:r;display:grid;grid-template-columns:36px minmax(0,1fr);padding:10px 0;border-bottom:1px solid var(--line)}
-.rules li::before{content:counter(r);font-family:var(--mono);color:var(--red);font-weight:700}
-.partners{padding:8px 0 48px}
-.partners-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
-.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
-.marquee-track{display:flex;width:max-content;animation:marq 48s linear infinite}
-.marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
-@keyframes marq{to{transform:translateX(-50%)}}
-.plogo{display:flex;align-items:center;gap:12px;padding:22px 36px;border-right:1px solid var(--line);color:#8A8A92;white-space:nowrap;transition:color .2s}
-.plogo:hover{color:var(--ink)}
-.plogo svg{flex:0 0 auto}
-.plogo b{font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:-.3px}
-.plogo small{display:block;font-size:11px;font-weight:700;color:var(--muted)}
-.plogo.gold b{color:var(--ink)}
-@media (prefers-reduced-motion:reduce){.marquee{overflow-x:auto}}
-body.kiosk .partners{display:none}
-footer{border-top:1px solid var(--line);padding:24px 0 40px;font-size:13px;color:var(--muted)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) skewX(-10deg);background:var(--ink);color:#fff;padding:10px 18px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+details.bd summary{cursor:pointer;font-size:12px;color:var(--muted);font-weight:700;list-style:none}
+details.bd summary::-webkit-details-marker{display:none}
+details.bd summary::after{content:" ▾"}
+details.bd table{margin-top:8px;font-size:12px}
+details.bd td{padding:4px 10px 4px 0;border:0}
+body.kiosk .ribbon,body.kiosk header,body.kiosk footer,body.kiosk .tabs,body.kiosk .ehead .crumbs,body.kiosk .notkiosk,body.kiosk #fbBtn{display:none!important}
+body.kiosk main{padding-top:20px}
+body.kiosk .tower td{font-size:22px;padding:18px 16px}body.kiosk .tname{font-size:24px}
+.kiosk-exit{display:none}
+body.kiosk .kiosk-exit{display:inline-flex;position:fixed;top:14px;right:14px;z-index:30}
+
+/* protocol */
+.plog{list-style:none;margin:0;padding:0}
+.plog>li{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:start}
+.plog .t{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.plog .k{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;margin-right:8px;background:var(--surface2);text-transform:uppercase;letter-spacing:.04em}
+.plog .k.edit{background:#FFF1D6;color:var(--amber)}
+.plog .k.penalty{background:#FFE6E4;color:var(--red-dark)}
+.plog .k.appeal{background:#EDE6FF;color:var(--purple)}
+.plog .k.resolve{background:#E2F4E8;color:var(--green)}
+.plog .k.void{background:#EDEDEA;color:var(--muted)}
+.plog .who{font-size:13px;color:var(--muted)}
+.plog .old{text-decoration:line-through;color:var(--muted)}
+.plog .af{grid-column:2/-1}
+@media (max-width:600px){.plog>li{grid-template-columns:minmax(0,1fr)}.plog .af{grid-column:1}}
+.appeal{border:1px solid #DED6FF;background:#FAF8FF;padding:16px 18px;margin-bottom:12px}
+.appeal .s{font-size:12px;font-weight:700}
+.appeal .s.open{color:var(--purple)}.appeal .s.accepted{color:var(--green)}.appeal .s.rejected{color:var(--muted)}
+.trust{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px 18px;background:var(--surface);margin-bottom:22px}
+.trust p{font-weight:700;font-size:14px;flex:1;min-width:220px}
+
+/* league */
+.lrow{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.lrow .bar{grid-column:2/-1;height:6px;background:var(--surface2)}
+.lrow .bar i{display:block;height:100%;background:var(--c,var(--ink))}
+.lrow:first-of-type .pos span{background:var(--red)}
+
+/* wizard */
+.wsteps{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--line);width:max-content;max-width:100%;overflow-x:auto}
+.wsteps span{padding:10px 16px;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.wsteps span+span{border-left:1px solid var(--line)}
+.wsteps span.on{background:var(--ink);color:#fff}
+.wsteps span.done{color:var(--ink)}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.pick button{text-align:left;border:1px solid var(--line);background:#fff;padding:18px;cursor:pointer;border-top:4px solid var(--c)}
+.pick button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:-2px}
+.pick button b{display:block;font-family:var(--display);font-weight:500;margin:8px 0 4px}
+.pick button span{font-size:13px;color:var(--muted)}
+.critedit{display:grid;grid-template-columns:minmax(0,1fr) 110px 36px;gap:8px;align-items:center;margin-top:8px}
+.critedit button{border:1px solid var(--line);background:#fff;height:42px;cursor:pointer}
+
+/* feedback */
+#fbBtn .short{display:none}@media (max-width:600px){#fbBtn .long{display:none}#fbBtn .short{display:inline}#fbBtn{padding:9px 14px}}
+.stats+section{margin-top:48px}
+#fbBtn{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:25;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+dialog{border:0;padding:0;max-width:min(520px,calc(100vw - 32px));width:100%;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(22,22,26,.5)}
+.dlg{padding:26px}
+.dlg h2{font-size:22px}
+.stars{display:flex;gap:6px;margin-top:8px}
+.stars button{width:46px;height:46px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:22px;line-height:1;color:#C9C9C4}
+.stars button[aria-pressed="true"]{color:var(--red);border-color:var(--ink)}
+.fbstat{font-size:13px;color:var(--muted);margin-top:6px}
+.fbx{position:absolute;top:14px;right:14px;border:0;background:none;font-size:22px;cursor:pointer;line-height:1;padding:6px}
+
+footer{border-top:1px solid var(--line);padding:26px 0 90px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) skewX(-10deg);background:var(--ink);color:#fff;padding:10px 18px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1}
-svg.track{width:100%;height:auto;display:block;overflow:visible}
+.empty{color:var(--muted);padding:26px;text-align:center;background:var(--surface)}
 </style>
 </head>
 <body>
+<div class="ribbon"><div class="wrap"><span>Прототип для Youthquake · дані демонстраційні, ваші дії зберігаються лише у вашому браузері</span><button type="button" data-a="reset">Скинути демо</button></div></div>
 <header>
   <div class="wrap bar">
-    <button class="logo" data-go="home" aria-label="LovkoTech — на головну">
+    <a class="logo" href="#/" aria-label="LovkoTech — на головну">
       <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><path d="M6 0h8L8 20H0z" fill="#E10600"/><path d="M17 0h13l-6 20H11z" fill="#16161A"/></svg>
       LovkoTech
-    </button>
+    </a>
     <nav class="main" id="nav" aria-label="Розділи">
-      <button data-go="home">Головна</button>
-      <button data-go="news">Анонси</button>
-      <button data-go="tracks">Траси</button>
-      <button data-go="builds">Конструктори</button>
-      <button data-go="makers">Виробники</button>
-      <button data-go="race">Гонка</button>
+      <a href="#/" data-nav="home">Головна</a>
+      <a href="#/events" data-nav="events">Події</a>
+      <a href="#/league" data-nav="league">Рейтинг сезону</a>
+      <a href="#/organizers" data-nav="organizers">Організаторам</a>
     </nav>
+    <a class="btn red sm" href="#/create"><span>Створити подію</span></a>
   </div>
 </header>
 <main><div class="wrap" id="main"></div></main>
-<section class="partners" aria-labelledby="partners-title">
-  <div class="wrap partners-head"><h2 class="sec-title" id="partners-title">Спонсори та партнери</h2><button class="btn sm" data-a="partner"><span class="chev">Стати партнером</span></button></div>
-  <div class="marquee" id="marquee"></div>
-</section>
-<footer><div class="wrap">LovkoTech — демо платформи для Youthquake 2026. Команди, конструктори, постачальники, спонсори й результати в демо вигадані; назви університетів використано лише для ілюстрації і не означають партнерства.</div></footer>
+<footer><div class="wrap">
+  <div>LovkoTech · STU-067 · НТУ «Дніпровська політехніка». Учасники, кав'ярні, оцінки й результати вигадані для демонстрації; назви університетів наведено лише для ілюстрації і не означають партнерства.</div>
+  <div><span id="footStat"></span> <a href="racing/">Розширений модуль перегонів (траси, конструктори)</a></div>
+</div></footer>
+<button class="btn red" id="fbBtn" type="button" data-a="fb-open" aria-label="Оцінити прототип"><span>★ <span class="long">Оцінити прототип</span><span class="short">Відгук</span></span></button>
+<button class="btn ink kiosk-exit" type="button" data-a="kiosk-off"><span>Вийти з табло</span></button>
+
+<dialog id="fbDlg" aria-labelledby="fbTitle">
+  <form class="dlg" id="fbForm" method="dialog">
+    <button class="fbx" type="button" data-a="fb-close" aria-label="Закрити">×</button>
+    <h2 id="fbTitle">Як вам прототип?</h2>
+    <p class="fbstat" id="fbStat">Ваш відгук побачить команда LovkoTech. Середню оцінку ми показуємо публічно.</p>
+    <label>Оцінка</label>
+    <div class="stars" id="fbStars" role="group" aria-label="Оцінка від 1 до 5"></div>
+    <label>Хто ви</label>
+    <div class="chips" id="fbRoles" role="group" aria-label="Роль"></div>
+    <label for="fbComment">Що було корисно, а чого бракує?</label>
+    <textarea id="fbComment" maxlength="2000" placeholder="Наприклад: хочу бачити, хто з суддів змінив бал і чому"></textarea>
+    <p class="hint" id="fbCtx"></p>
+    <div class="actions"><button class="btn red" type="submit" id="fbSend"><span>Надіслати відгук</span></button><span class="hint" id="fbErr" role="alert"></span></div>
+  </form>
+</dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ============ constants ============ */
-const CLASSES={"Міні-боліди 1:10":{mass:3},"Автономні мікродрони":{mass:0.25},"Мобільні роботи":{mass:5}};
-const CHECKS=[["mass","Маса в межах класу"],["estop","Аварійна кнопка / E-stop"],["battery","Ізоляція та кріплення батареї"],["sensors","Датчики й транспондер"]];
-const PENALTY=2000;
-const COLS=["universities","builds","suppliers","announcements","votes","teams","laps"];
+"use strict";
+/* ================= formats ================= */
+const ICONS={
+ race:'<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17h20l-3-6H9l-3 6"/><circle cx="8" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 11V5h6"/></svg>',
+ latte:'<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h15v6a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6z"/><path d="M19 11h2a2 2 0 0 1 0 5h-2"/><path d="M11.5 18c-2-1.5-3-3-1.5-4.5 1-1 1.5-.2 1.5.5 0-.7.5-1.5 1.5-.5 1.5 1.5.5 3-1.5 4.5z"/></svg>',
+ hack:'<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7l-6 6 6 6M17 7l6 6-6 6M15 4l-4 18"/></svg>',
+ robo:'<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="16" height="12"/><path d="M13 8V4M10 4h6"/><circle cx="10" cy="14" r="1.5"/><circle cx="16" cy="14" r="1.5"/><path d="M2 13v4M24 13v4"/></svg>',
+ plus:'<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 5v16M5 13h16"/></svg>',
+ shield:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5z"/><path d="M7 10l2 2 4-4"/></svg>',
+ lock:'<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="14" height="10"/><path d="M7 10V7a4 4 0 0 1 8 0v3"/></svg>'
+};
+const FORMATS={
+ race:{name:"Інженерні перегони",short:"Перегони",color:"#E10600",unit:"Команда",units:"команд",scoring:"time",org:"Університет",
+  desc:"Боліди, дрони й мобільні роботи: хронометраж, штрафи, техкомісія.",
+  fields:[{id:"vehicle",label:"Назва машини"},{id:"mass",label:"Маса, кг",type:"number"}],
+  criteria:[{id:"lap",name:"Найкраще коло",max:0}],
+  penalties:[{id:"cut",name:"Зрізання повороту",v:2},{id:"jump",name:"Фальстарт",v:3},{id:"help",name:"Допомога на трасі",v:5}],penUnit:"с"},
+ latte:{name:"Латте-арт і кава",short:"Латте-арт",color:"#7A4B2E",unit:"Бариста",units:"бариста",scoring:"points",org:"Кав'ярня",
+  desc:"Фестивалі й баттли бариста: журі оцінює кожну чашку за критеріями.",
+  fields:[{id:"pattern",label:"Малюнок (тюльпан, лебідь, розета…)"}],
+  criteria:[{id:"sym",name:"Симетрія",max:10},{id:"contrast",name:"Контраст",max:10},{id:"complex",name:"Складність",max:10},{id:"foam",name:"Якість молочної піни",max:10},{id:"imp",name:"Загальне враження",max:10}],
+  penalties:[{id:"time",name:"Перевищення часу",v:3},{id:"spill",name:"Розлив на блюдце",v:2}],penUnit:"бали"},
+ hack:{name:"Хакатони",short:"Хакатон",color:"#6A1FC9",unit:"Команда",units:"команд",scoring:"points",org:"Університет / спільнота",
+  desc:"Командні проєкти за 24–48 годин: журі, критерії, пітчі й демо.",
+  fields:[{id:"project",label:"Назва проєкту"}],
+  criteria:[{id:"problem",name:"Проблема і користувач",max:10},{id:"tech",name:"Технічна реалізація",max:10},{id:"demo",name:"Демо і пітч",max:10},{id:"impact",name:"Вплив і сталість",max:10}],
+  penalties:[{id:"over",name:"Перевищення часу пітчу",v:2}],penUnit:"бали"},
+ robo:{name:"Робототехніка",short:"Роботи",color:"#0E7A3A",unit:"Команда",units:"команд",scoring:"points",org:"Університет / школа",
+  desc:"Завдання на полі: виконання, автономність, час і інженерне рішення.",
+  fields:[{id:"robot",label:"Назва робота"}],
+  criteria:[{id:"task",name:"Виконання завдання",max:40},{id:"auto",name:"Автономність",max:20},{id:"time",name:"Час виконання",max:20},{id:"eng",name:"Інженерне рішення",max:20}],
+  penalties:[{id:"touch",name:"Ручне втручання",v:5},{id:"out",name:"Виїзд за межі поля",v:3}],penUnit:"бали"}
+};
+const STATUS={live:"Наживо",registration:"Реєстрація відкрита",announced:"Анонс",finished:"Завершено"};
+const POINTS=[25,18,15,12,10,8,6,4,2,1];
 
-/* ============ state ============ */
-let state={event:null};COLS.forEach(c=>state[c]=[]);
-let ui={view:"home",race:"board",buildFilter:"all",makerFilter:"all",editBuild:null,editEvent:false};
-try{Object.assign(ui,JSON.parse(localStorage.getItem("pw2.ui")||"{}"));ui.editBuild=null;ui.editEvent=false}catch(e){}
-const drafts={};
-let uid=null,lastLap=null,flashTeam=null;
-let judge={team:"",start:null,running:false,pen:0,raf:0};
-
-/* ============ helpers ============ */
+/* ================= utils ================= */
 const $=s=>document.querySelector(s);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const uni=id=>state.universities.find(u=>u.id===id);
-const fmt=ms=>{if(ms==null)return"—";const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),t=ms%1000;return`${m}:${String(s).padStart(2,"0")}.${String(t).padStart(3,"0")}`};
-function parseTime(v){v=v.trim().replace(",",".");let m=v.match(/^(\d+):(\d{1,2})(?:\.(\d{1,3}))?$/);if(m)return m[1]*60000+m[2]*1000+(m[3]?+m[3].padEnd(3,"0"):0);m=v.match(/^(\d+)(?:\.(\d{1,3}))?$/);return m?m[1]*1000+(m[2]?+m[2].padEnd(3,"0"):0):null}
-const dateParts=d=>{const x=new Date(d+"T12:00");return{day:x.getDate(),mon:x.toLocaleDateString("uk-UA",{month:"short"}).replace(".",""),full:x.toLocaleDateString("uk-UA",{day:"numeric",month:"long",year:"numeric"})}};
-const daysTo=d=>Math.ceil((new Date(d+"T09:00")-new Date())/86400000);
-const plural=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c};
-function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("show"),2200)}
-const admitted=t=>CHECKS.every(([k])=>t.checks&&t.checks[k]);
-const saveUi=()=>{try{localStorage.setItem("pw2.ui",JSON.stringify({view:ui.view,race:ui.race,buildFilter:ui.buildFilter,makerFilter:ui.makerFilter}))}catch(e){}};
-const d=(form,field,def)=>drafts[form]&&field in drafts[form]?drafts[form][field]:def;
-const verifiedMark=`<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 0h12l-2 14H0z" fill="#E10600"/><path d="M4 7.2l2 2 4-4.4" stroke="#fff" stroke-width="1.8" fill="none"/></svg>`;
-
-/* ============ unique circuit generator ============ */
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=p=>(p||"x")+Math.random().toString(36).slice(2,9);
+const fmtMs=ms=>{if(ms==null||!isFinite(ms))return"—";const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),x=Math.round(ms%1000);return`${m}:${String(s).padStart(2,"0")}.${String(x).padStart(3,"0")}`};
+const parseTime=v=>{v=String(v).trim().replace(",",".");let m=v.match(/^(\d+):(\d{1,2})(?:\.(\d{1,3}))?$/);if(m)return m[1]*60000+m[2]*1000+(m[3]?+m[3].padEnd(3,"0"):0);m=v.match(/^(\d+)(?:\.(\d{1,3}))?$/);return m?m[1]*1000+(m[2]?+m[2].padEnd(3,"0"):0):null};
+const num=(x,d=1)=>(Math.round(x*10**d)/10**d).toFixed(d).replace(".",",");
+const MONTHS=["січня","лютого","березня","квітня","травня","червня","липня","серпня","вересня","жовтня","листопада","грудня"];
+const dateUa=iso=>{const d=new Date(iso+"T12:00:00");return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`};
+const timeOf=iso=>{const d=new Date(iso);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`};
+const dtUa=iso=>{const d=new Date(iso);return`${d.getDate()} ${MONTHS[d.getMonth()]}, ${timeOf(iso)}`};
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("show"),2600)}
 function rng(seed){let s=seed>>>0||1;return()=>(s=(s*1664525+1013904223)>>>0)/4294967296}
-function circuit(seed,turns){
-  const r=rng(seed*7919+13),n=Math.max(7,Math.min(14,turns+1)),pts=[];
-  for(let i=0;i<n;i++){
-    const a=-Math.PI/2+i*2*Math.PI/n+(r()-.5)*0.35;
-    let rad=0.62+r()*0.38;if(r()<0.28)rad*=0.62;
-    pts.push([300+Math.cos(a)*250*rad,150+Math.sin(a)*132*rad]);
+async function sha(obj){
+  const data=new TextEncoder().encode(JSON.stringify(obj));
+  if(window.crypto&&crypto.subtle){const h=await crypto.subtle.digest("SHA-256",data);return[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join("")}
+  let h=2166136261;for(const b of data){h^=b;h=Math.imul(h,16777619)>>>0}return h.toString(16).padStart(8,"0")+"-fnv";
+}
+const lockPayload=e=>({format:e.format,title:e.title,criteria:e.criteria,penalties:e.penalties,rules:e.rules});
+
+/* ================= seed data ================= */
+function seed(){
+  const R=rng(20261020);
+  const iso=(d,h,m)=>new Date(`${d}T${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00`).toISOString();
+  const events=[];
+  const mk=o=>Object.assign({participants:[],judges:[],scores:{},laps:[],protocol:[],appeals:[],rules:[],regHistory:[]},o);
+  const P=(name,org,extra)=>Object.assign({id:uid("p"),name,org,status:"confirmed"},extra||{});
+  const log=(e,t,who,kind,text,pid,extra)=>{const en=Object.assign({id:uid("l"),t,who,kind,text,pid:pid||null},extra||{});e.protocol.push(en);return en};
+
+  /* --- live latte festival --- */
+  const lat=mk({id:"dnipro-latte",format:"latte",title:"Dnipro Latte Art Throwdown",city:"Дніпро",venue:"Фестиваль кави на Набережній, сцена B",date:"2026-10-20",status:"live",
+    organizer:"Спільнота «Кавовий Дніпро»",criteria:FORMATS.latte.criteria.map(c=>({...c})),penalties:FORMATS.latte.penalties.map(c=>({...c})),
+    rules:["Кожен бариста готує одну чашку капучино 180 мл за 3 хвилини","Малюнок оголошується до початку раунду","Журі з трьох суддів оцінює чашку незалежно","Підсумок — середнє суддів мінус штрафи","Рішення можна оскаржити протягом 15 хвилин після публікації"],
+    judges:["Ірина Коваль (головна суддя)","Максим Дорош","Олена Ткач"]});
+  [["Анна Мельник","Кав'ярня «Зерно»","розета"],["Дмитро Савчук","Кав'ярня «Ліхтар»","лебідь"],["Софія Бондар","«Пара і Пінка»","тюльпан"],["Артем Гнатюк","Обсмажувальня «Терикон»","розета"],
+   ["Вікторія Лисенко","Кав'ярня «Зерно»","серце-тюльпан"],["Назар Остапенко","«Молоко і Мед»","лебідь"],["Марія Руденко","Кав'ярня «Ліхтар»","тюльпан"],["Олег Кравець","«Пара і Пінка»","розета"]]
+   .forEach(([n,o,p])=>lat.participants.push(P(n,o,{pattern:p})));
+  let t0=new Date("2026-10-20T15:00:00").getTime();
+  lat.participants.slice(0,6).forEach((p,i)=>{
+    lat.judges.forEach((j,ji)=>{
+      const base=6+R()*3.2+(i===1?0.8:0)+(i===3?0.6:0);
+      const sc={};lat.criteria.forEach(c=>sc[c.id]=Math.max(4,Math.min(10,Math.round((base+(R()-.5)*2)*2)/2)));
+      (lat.scores[p.id]=lat.scores[p.id]||{})[j]=sc;
+      t0+=60000+R()*50000;
+      log(lat,new Date(t0).toISOString(),j,"score",`оцінка: ${lat.criteria.map(c=>`${c.name} ${num(sc[c.id],1).replace(",0","")}`).join(" · ")}`,p.id,{total:Object.values(sc).reduce((a,b)=>a+b,0)});
+    });
+  });
+  // a corrected score (edit) on participant 2 by judge 2
+  {const p=lat.participants[2],j=lat.judges[1],sc=lat.scores[p.id][j],old=sc.contrast;sc.contrast=Math.min(10,old+1);
+   t0+=90000;log(lat,new Date(t0).toISOString(),j,"edit",`Контраст: <span class="old">${num(old,1).replace(",0","")}</span> → ${num(sc.contrast,1).replace(",0","")}. Причина: «переглянув фото чашки, контраст чіткіший, ніж здалося на світлі сцени»`,p.id);}
+  // penalties
+  {const p=lat.participants[4];t0+=40000;const en=log(lat,new Date(t0).toISOString(),lat.judges[0],"penalty",`Перевищення часу: −3 бали (3:12 замість 3:00)`,p.id,{pen:"time",v:3});
+   // appeal on that penalty — open
+   t0+=120000;const ap={id:uid("a"),entryId:en.id,pid:p.id,by:p.name,reason:"Таймер стартував до того, як подали молоко — є відео з телефона",status:"open",t:new Date(t0).toISOString()};
+   lat.appeals.push(ap);log(lat,ap.t,p.name,"appeal","подано апеляцію на штраф «Перевищення часу»: «"+ap.reason+"»",p.id,{appealId:ap.id});}
+  {const p=lat.participants[1];t0+=30000;const en=log(lat,new Date(t0).toISOString(),lat.judges[2],"penalty","Розлив на блюдце: −2 бали",p.id,{pen:"spill",v:2});
+   t0+=100000;const ap={id:uid("a"),entryId:en.id,pid:p.id,by:p.name,reason:"Крапля була від попереднього учасника, блюдце не замінили",status:"accepted",reply:"Перевірено за відео трансляції — штраф скасовано",t:new Date(t0).toISOString()};
+   lat.appeals.push(ap);log(lat,ap.t,p.name,"appeal","подано апеляцію на штраф «Розлив на блюдце»: «"+ap.reason+"»",p.id,{appealId:ap.id});
+   t0+=180000;en.voided=true;log(lat,new Date(t0).toISOString(),lat.judges[0],"resolve","апеляцію прийнято, штраф «Розлив на блюдце» скасовано: «"+ap.reply+"»",p.id,{appealId:ap.id});}
+  lat.locked={at:iso("2026-10-18",19,40)};
+  events.push(lat);
+
+  /* --- finished race --- */
+  const teams=[["Dnipro Volt","НТУ «Дніпровська політехніка»","Volt-3",2.6],["KPI Apex","КПІ ім. Ігоря Сікорського","Apex R2",2.8],["Odesa Current","Одеська політехніка","Current S",2.7],["Lviv Torque","Львівська політехніка","Torque 1",2.9],
+               ["Kharkiv Spark","ХАІ","Spark X",2.5],["Zaporizhzhia Drive","Запорізька політехніка","ZD-01",2.9],["Poltava Pulse","Полтавська політехніка","Pulse",2.7],["Sumy Kinetic","Сумський держуніверситет","Kinetic",2.8]];
+  function raceEvent(id,title,date,venue,city,seedShift,status){
+    const r=rng(9000+seedShift);
+    const e=mk({id,format:"race",title,city,venue,date,status,organizer:"Студрада НТУ «ДП» · LovkoTech",
+      criteria:FORMATS.race.criteria.map(c=>({...c})),penalties:FORMATS.race.penalties.map(c=>({...c})),
+      rules:["Клас: міні-боліди 1:10, маса до 3,0 кг","Техкомісія до заїздів: маса, E-stop, батарея","Кожна команда має 5 залікових кіл","Зараховується найкраще коло з урахуванням штрафів","Апеляція — до оголошення фінальних результатів"],
+      judges:["Сергій Литвин (головний суддя)","Катерина Іваненко"]});
+    teams.forEach(([n,o,v,m])=>e.participants.push(P(n,o,{vehicle:v,mass:m})));
+    if(status==="finished"){
+      let t=new Date(date+"T13:00:00").getTime();
+      e.participants.forEach((p,i)=>{for(let k=0;k<4;k++){const ms=41500+i*260+r()*1600;let pen=0,pid=null;if(r()<.13){pen=[2,3][r()<.6?0:1];pid=pen===2?"cut":"jump"}
+        t+=50000+r()*20000;const lap={id:uid("lap"),pid:p.id,ms:Math.round(ms),pen,penId:pid,t:new Date(t).toISOString()};e.laps.push(lap);
+        log(e,lap.t,e.judges[k%2],"lap",`коло ${fmtMs(lap.ms)}${pen?` · штраф +${pen} с (${FORMATS.race.penalties.find(x=>x.id===pid).name})`:""}`,p.id,{lapId:lap.id});}});
+      // appeal accepted: remove a penalty from Dnipro Volt's best attempt
+      const dv=e.participants[0];const pl=e.laps.find(l=>l.pid===dv.id&&l.pen)||e.laps.find(l=>l.pid===dv.id);
+      if(!pl.pen){pl.pen=2;pl.penId="cut"}
+      const en=e.protocol.find(x=>x.lapId===pl.id);en.text=`коло ${fmtMs(pl.ms)} · штраф +${pl.pen} с (Зрізання повороту)`;
+      t+=200000;const ap={id:uid("a"),entryId:en.id,pid:dv.id,by:dv.name,reason:"На відео з камери повороту 4 колеса не виходили за кербу",status:"accepted",reply:"Перевірено відео з камери Т4, штраф знято",t:new Date(t).toISOString()};
+      e.appeals.push(ap);log(e,ap.t,dv.name,"appeal","подано апеляцію на штраф: «"+ap.reason+"»",dv.id,{appealId:ap.id});
+      t+=240000;pl.pen=0;log(e,new Date(t).toISOString(),e.judges[0],"resolve","апеляцію прийнято: «"+ap.reply+"»",dv.id,{appealId:ap.id});
+    }
+    e.locked={at:new Date(new Date(date+"T12:00:00").getTime()-3*86400000).toISOString()};
+    return e;
   }
-  let p=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
-  for(let i=0;i<n;i++){const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
-    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
-    p+=` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`}
-  return{path:p+"Z",start:pts[0],next:pts[1],pts};
-}
-function trackSVG(u,{big=false}={}){
-  if(!u||!u.track)return"";
-  const c=circuit(u.track.seed,u.track.turns),[sx,sy]=c.start,ang=Math.atan2(c.next[1]-sy,c.next[0]-sx)*180/Math.PI;
-  const turnsLbl=big?c.pts.slice(1).map((p,i)=>`<text x="${(p[0]+(p[0]-300)*0.1).toFixed(1)}" y="${(p[1]+(p[1]-150)*0.14+4).toFixed(1)}" font-size="11" font-family="JetBrains Mono,monospace" fill="#5E5E66" text-anchor="middle">${i+1}</text>`).join(""):"";
-  return`<svg class="track" viewBox="0 0 600 300" role="img" aria-label="Схема траси «${esc(u.track.name)}»: ${u.track.lengthM} м, ${u.track.turns} поворотів">
-  <path d="${c.path}" fill="none" stroke="#EDEDEA" stroke-width="${big?22:18}" stroke-linejoin="round"/>
-  <path d="${c.path}" fill="none" stroke="#16161A" stroke-width="${big?4:3.5}" stroke-linejoin="round"/>
-  <path d="${c.path}" pathLength="300" fill="none" stroke="#E10600" stroke-width="${big?4:3.5}" stroke-dasharray="100 200" stroke-linejoin="round"/>
-  <g transform="translate(${sx.toFixed(1)} ${sy.toFixed(1)}) rotate(${ang.toFixed(1)})"><rect x="-3" y="-13" width="6" height="26" fill="#fff" stroke="#16161A" stroke-width="1.5"/><rect x="-3" y="-13" width="3" height="6.5" fill="#16161A"/><rect x="0" y="-6.5" width="3" height="6.5" fill="#16161A"/><rect x="-3" y="0" width="3" height="6.5" fill="#16161A"/><rect x="0" y="6.5" width="3" height="6.5" fill="#16161A"/></g>
-  ${turnsLbl}</svg>`;
+  events.push(raceEvent("lovkotech-cup-1","Кубок LovkoTech · Етап 1","2026-09-27","Кільце Політехніки, 420 м · 9 поворотів","Дніпро",1,"finished"));
+  const r2=raceEvent("lovkotech-cup-2","Кубок LovkoTech · Етап 2","2026-11-15","Траса «Київський трикутник», 380 м","Київ",2,"registration");
+  r2.participants=r2.participants.slice(0,5);r2.participants[3].status="pending";r2.participants[4].status="pending";events.push(r2);
+
+  /* --- finished latte cup (for season) --- */
+  const lc=mk({id:"latte-cup-autumn",format:"latte",title:"Latte Art Cup · Осінній раунд",city:"Дніпро",venue:"Обсмажувальня «Терикон»",date:"2026-09-13",status:"finished",organizer:"Спільнота «Кавовий Дніпро»",
+    criteria:FORMATS.latte.criteria.map(c=>({...c})),penalties:FORMATS.latte.penalties.map(c=>({...c})),rules:lat.rules.slice(),judges:["Ірина Коваль (головна суддя)","Максим Дорош","Олена Ткач"]});
+  lat.participants.forEach(p=>lc.participants.push(P(p.name,p.org,{pattern:p.pattern})));
+  {let t=new Date("2026-09-13T14:00:00").getTime();const r=rng(77);
+   lc.participants.forEach((p,i)=>lc.judges.forEach(j=>{const base=6.2+r()*3;const sc={};lc.criteria.forEach(c=>sc[c.id]=Math.max(4,Math.min(10,Math.round((base+(r()-.5)*2)*2)/2)));(lc.scores[p.id]=lc.scores[p.id]||{})[j]=sc;t+=70000;
+     log(lc,new Date(t).toISOString(),j,"score",`оцінка: ${lc.criteria.map(c=>`${c.name} ${String(sc[c.id]).replace(".",",")}`).join(" · ")}`,p.id)}));}
+  lc.locked={at:"2026-09-10T18:00:00.000Z"};events.push(lc);
+
+  /* --- hackathon: registration --- */
+  const hk=mk({id:"hack-city",format:"hack",title:"Хакатон «Місто, що працює»",city:"Дніпро",venue:"Коворкінг університету, 2 поверх",date:"2026-11-08",status:"registration",organizer:"Студрада факультету ІТ",
+    criteria:FORMATS.hack.criteria.map(c=>({...c})),penalties:FORMATS.hack.penalties.map(c=>({...c})),
+    rules:["Команди 2–5 осіб, тривалість 36 годин","Пітч — 4 хвилини, демо — 3 хвилини","Код і презентацію завантажують до дедлайну","Журі з 4 експертів, оцінки публікуються після пітчів"],judges:["Журі формується"]});
+  [["Byte Brigade","НТУ «ДП»","Карта укриттів"],["Green Route","ДНУ ім. Гончара","Вело-маршрути"],["Null Pointer","НТУ «ДП»","Чергу в ЦНАП — онлайн"]].forEach(([n,o,pr])=>hk.participants.push(P(n,o,{project:pr})));
+  hk.locked={at:"2026-10-15T10:00:00.000Z"};events.push(hk);
+
+  /* --- robotics: announced --- */
+  const rb=mk({id:"robosprint",format:"robo",title:"RoboSprint · Сортування вантажів",city:"Одеса",venue:"Одеська політехніка, лабораторія 214",date:"2026-11-22",status:"announced",organizer:"Кафедра робототехніки (демо)",
+    criteria:FORMATS.robo.criteria.map(c=>({...c})),penalties:FORMATS.robo.penalties.map(c=>({...c})),
+    rules:["Поле 2×2 м, 6 кольорових вантажів","3 спроби, зараховується найкраща","Повна автономність — бонус до 20 балів"],judges:["Журі формується"]});
+  rb.locked={at:"2026-10-19T09:00:00.000Z"};events.push(rb);
+
+  /* --- latte festival: announced --- */
+  const lk=mk({id:"kyiv-coffee-fest",format:"latte",title:"Фестиваль кави «Подільська чашка»",city:"Київ",venue:"Контрактова площа",date:"2026-12-06",status:"announced",organizer:"Фестивальна команда (демо)",
+    criteria:FORMATS.latte.criteria.map(c=>({...c})),penalties:FORMATS.latte.penalties.map(c=>({...c})),rules:lat.rules.slice(0,4),judges:["Журі формується"]});
+  lk.locked={at:"2026-10-19T12:00:00.000Z"};events.push(lk);
+
+  events.forEach(e=>e.protocol.sort((a,b)=>a.t<b.t?-1:1));
+  return{v:3,events};
 }
 
-/* ============ demo data ============ */
-function demoData(){
-  const now=Date.now();
-  const universities=[
-    ["u1","НТУ «Дніпровська політехніка»","Дніпро","Кільце Політехніки",420,9,7,true,"3D-друк, фрезерування ЧПК, паяння плат"],
-    ["u2","КПІ ім. Ігоря Сікорського","Київ","Петля Сікорського",510,11,13,true,"Лазерна різка, композити"],
-    ["u3","Львівська політехніка","Львів","Львівські пагорби",460,12,21,true,"Лиття пластику, 3D-друк"],
-    ["u4","Харківський політехнічний інститут","Харків","Харківський спринт",380,7,4,false,""],
-    ["u5","Одеська політехніка","Одеса","Портова траса",440,10,33,true,"Токарна обробка, зварювання"],
-    ["u6","Запорізька політехніка","Запоріжжя","Дніпровський вигин",400,8,9,false,""]
-  ].map(([id,name,city,tn,len,turns,seed,man,caps],i)=>({id,order:i,name,city,manufacture:man,capabilities:caps,verified:true,track:{name:tn,lengthM:len,turns,seed}}));
-  const builds=[
-    ["b1","u1","Volt-3","Міні-боліди 1:10",2.6,"BLDC 3650, 3900KV","2S LiPo, 7.4 В, 5000 мА·год","Задній, диференціал","Датчик Холла, IMU","Відкрита",3,"Нова підвіска, мінус 180 г"],
-    ["b2","u2","Apex R","Міні-боліди 1:10",2.9,"BLDC 3660, 3200KV","3S LiPo, 11.1 В, 4000 мА·год","Повний","IMU, енкодери","За запитом",2,"Жорсткіше шасі"],
-    ["b3","u3","Sokil-M","Автономні мікродрони",0.24,"4 × 1103, 10000KV","1S LiPo, 450 мА·год","—","ESP32-CAM, ToF-далекомір","Відкрита",2,"Новий алгоритм розпізнавання воріт"],
-    ["b4","u5","Breeze","Міні-боліди 1:10",2.8,"BLDC 3650, 4000KV","2S LiPo, 7.4 В, 6000 мА·год","Задній","IMU","Відкрита",1,"Перша версія"],
-    ["b5","u4","Tracker-2","Мобільні роботи",4.1,"2 × DC 12 В з редуктором","3S Li-ion, 11.1 В","Гусеничний","Лідар, лінійні датчики","За запитом",2,"Лідар замість ІЧ-датчиків"]
-  ].map(([id,uniId,name,cls,mass,motor,battery,drive,sensors,license,version,note],i)=>({id,uniId,name,cls,mass,motor,battery,drive,sensors,license,version,note,desc:"",updatedAt:now-i*86400000*3}));
-  const suppliers=[
-    ["s1","Кіловат Компоненти","Київ","Електроніка","Мотори BLDC, регулятори ESC, LiPo-батареї",true],
-    ["s2","PrintFab Дніпро","Дніпро","Виготовлення деталей","SLA- і FDM-друк, нейлон, карбон-заповнені пластики",true],
-    ["s3","Roboparts UA","Львів","Електроніка","ESP32, датчики, лідари, транспондери",true],
-    ["s4","Шасі-Про","Харків","Механіка","Карбонові пластини, підвіска для масштабу 1:10",false]
-  ].map(([id,name,city,category,offers,verified])=>({id,name,city,category,offers,verified}));
-  const announcements=[
-    ["a1","Кубок LovkoTech · Етап 1","2026-11-14","Міні-боліди 1:10","u1","registration","Перший міжвузівський етап. Реєстрація команд і техком — онлайн."],
-    ["a2","Autonomy Challenge","2026-12-05","Автономні мікродрони","u3","soon","Автономне проходження воріт без пілота. Регламент буде опубліковано 1 листопада."],
-    ["a3","Зимовий спринт","2027-02-20","Міні-боліди 1:10","","vote","Місце проведення обирають учасники: голосуйте за трасу."]
-  ].map(([id,title,date,cls,venueUniId,status,body])=>({id,title,date,cls,venueUniId,status,body}));
-  const votes=[["v1","u1"],["v2","u1"],["v3","u2"],["v4","u3"],["v5","u1"],["v6","u5"],["v7","u3"]].map(([id,uniId],i)=>({id,uniId,at:now-i*1000}));
-  const teams=[["t1","Dnipro Volt","u1","b1",2.6,7.4,[1,1,1,1]],["t2","Odesa Current","u5","b4",2.8,7.4,[1,1,1,1]],["t3","KPI Apex","u2","b2",2.9,11.1,[1,1,1,1]],["t4","Lviv Torque","u3","",3.2,11.1,[0,1,1,0]]]
-    .map(([id,name,uniId,buildId,mass,volt,c],i)=>({id,name,uniId,buildId,mass,volt,createdAt:now+i,checks:{mass:!!c[0],estop:!!c[1],battery:!!c[2],sensors:!!c[3]}}));
-  const laps=[["t1",42310,0],["t2",43880,2000],["t3",41975,0],["t1",41620,0],["t2",42410,0],["t3",42050,2000]].map(([teamId,ms,penaltyMs],i)=>({id:"l"+i,teamId,ms,penaltyMs,at:now-60000+i*5000}));
-  const event={name:"Кубок LovkoTech · Етап 1",cls:"Міні-боліди 1:10",date:"2026-11-14",venueUniId:"u1",
-    rules:["Старт з місця за сигналом судді","Коло зараховується після проходження всіх воріт","Пропущені ворота — штраф +2 секунди","У залік іде найкраще коло з урахуванням штрафів","До заїзду допускаються лише машини, що пройшли техком"]};
-  return{event,universities,builds,suppliers,announcements,votes,teams,laps};
+/* ================= state ================= */
+const KEY="lt3.state";
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){S=null}
+if(!S||S.v!==3)S=seed();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+async function ensureHashes(){let ch=false;for(const e of S.events){if(e.locked&&!e.locked.hash){e.locked.hash=await sha(lockPayload(e));ch=true}}if(ch){save();render()}}
+const ev=id=>S.events.find(e=>e.id===id);
+const part=(e,pid)=>e.participants.find(p=>p.id===pid);
+
+/* ================= scoring ================= */
+function results(e){
+  const F=FORMATS[e.format];
+  const pens=pid=>e.protocol.filter(x=>x.kind==="penalty"&&x.pid===pid&&!x.voided).reduce((a,x)=>a+(x.v||0),0);
+  if(F.scoring==="time"){
+    const rows=e.participants.filter(p=>p.status==="confirmed").map(p=>{
+      const laps=e.laps.filter(l=>l.pid===p.id&&!l.void);
+      const vals=laps.map(l=>l.ms+(l.pen||0)*1000);
+      const best=vals.length?Math.min(...vals):null;
+      return{p,best,laps:laps.length,penSum:laps.reduce((a,l)=>a+(l.pen||0),0),detail:laps};
+    });
+    rows.sort((a,b)=>(a.best??1e12)-(b.best??1e12));
+    const lead=rows[0]&&rows[0].best;
+    rows.forEach(r=>r.gap=r.best!=null&&lead!=null?r.best-lead:null);
+    return{type:"time",rows};
+  }
+  const rows=e.participants.filter(p=>p.status==="confirmed").map(p=>{
+    const by=e.scores[p.id]||{};const js=Object.keys(by);
+    const totals=js.map(j=>e.criteria.reduce((a,c)=>a+(+by[j][c.id]||0),0));
+    const avg=totals.length?totals.reduce((a,b)=>a+b,0)/totals.length:null;
+    const pen=pens(p.id);
+    return{p,judges:js.length,avg,pen,total:avg==null?null:avg-pen,by};
+  });
+  rows.sort((a,b)=>(b.total??-1e9)-(a.total??-1e9));
+  return{type:"points",rows,max:e.criteria.reduce((a,c)=>a+(+c.max||0),0)};
+}
+function standings(format){
+  const tbl={};let evs=0;
+  S.events.filter(e=>e.format===format&&(e.status==="finished"||e.status==="live")).forEach(e=>{
+    const r=results(e).rows.filter(x=>(x.best??x.total)!=null);if(!r.length)return;evs++;
+    r.forEach((x,i)=>{const k=x.p.org;(tbl[k]=tbl[k]||{org:k,pts:0,events:new Set(),best:99});tbl[k].pts+=POINTS[i]||0;tbl[k].events.add(e.id);tbl[k].best=Math.min(tbl[k].best,i+1)});
+  });
+  return{evs,rows:Object.values(tbl).sort((a,b)=>b.pts-a.pts||a.best-b.best)};
 }
 
-/* ============ data layer ============ */
-const localApi={
-  add(c,x){state[c].push({...x,id:c[0]+Date.now()});render();return Promise.resolve()},
-  set(c,id,x){const i=state[c].findIndex(e=>e.id===id);i<0?state[c].push({...x,id}):state[c][i]={...x,id};render();return Promise.resolve()},
-  update(c,id,p){Object.assign(state[c].find(e=>e.id===id)||{},p);render();return Promise.resolve()},
-  del(c,id){state[c]=state[c].filter(e=>e.id!==id);render();return Promise.resolve()},
-  setEvent(e){state.event=e;render();return Promise.resolve()}
-};
-let api=localApi;
-function liveApi(db){
-  const fail=e=>{console.warn(e);setLive(false,"Немає синхронізації")};
-  db.doc("event/current").onSnapshot(s=>{state.event=s.exists?s.data():null;render()},fail);
-  COLS.forEach(c=>db.collection(c).limit(1000).onSnapshot(q=>{state[c]=q.docs.map(x=>({id:x.id,...x.data()}));render()},fail));
-  return{
-    add:(c,x)=>db.collection(c).add(x),
-    set:(c,id,x)=>db.doc(c+"/"+id).set(x),
-    update:(c,id,p)=>db.doc(c+"/"+id).update(p),
-    del:(c,id)=>db.doc(c+"/"+id).delete(),
-    setEvent:e=>db.doc("event/current").set(e)
-  };
+/* ================= views ================= */
+const fmtTag=(f,cls="")=>`<span class="tag ${cls}" style="--accent:${FORMATS[f].color}"><span>${esc(FORMATS[f].short)}</span></span>`;
+const statusTxt=e=>`<span class="status st-${e.status}">${STATUS[e.status]}</span>`;
+function eventCard(e){
+  const F=FORMATS[e.format];const n=e.participants.length;
+  return`<a class="ev" href="#/e/${e.id}" style="--c:${F.color}">
+    <div class="top">${e.status==="live"?`<span class="tag live"><span>Наживо</span></span>`:fmtTag(e.format)}${statusTxt(e)}</div>
+    <h3>${esc(e.title)}</h3>
+    <div class="meta"><span>${dateUa(e.date)} · ${esc(e.city)}</span><span>${esc(e.venue)}</span></div>
+    <div class="foot"><span>${n} ${esc(F.units)}</span><span>Відкрити →</span></div></a>`;
 }
-async function write(p,msg){try{await p;if(msg)toast(msg);return true}catch(e){toast(e&&e.code==="not_granted"?"Немає прав на зміни в цьому демо":"Не вдалося зберегти, спробуйте ще раз");return false}}
-function setLive(){}
-
-/* ============ derived ============ */
-function voteCounts(){const m={};state.universities.forEach(u=>m[u.id]=0);state.votes.forEach(v=>{if(v.uniId in m)m[v.uniId]++});return m}
-function standings(){
-  return state.teams.map(t=>{const ls=state.laps.filter(l=>l.teamId===t.id),tot=ls.map(l=>l.ms+(l.penaltyMs||0));
-    return{t,n:ls.length,best:tot.length?Math.min(...tot):null,pen:ls.reduce((s,l)=>s+(l.penaltyMs||0),0)}}).filter(r=>r.n).sort((a,b)=>a.best-b.best);
+function ethicBlock(){
+  const item=(t,d)=>`<li>${ICONS.shield}<div><b>${t}</b><span class="muted">${d}</span></div></li>`;
+  return`<section class="ethic" aria-labelledby="eth-t"><div><p class="tagline">Сталий вимір · етика</p><h2 id="eth-t">Стандарт чесного суддівства</h2>
+    <p class="lede" style="font-size:15px">У тестуванні 58% респондентів обрали саме чесне суддівство найсильнішою цінністю. Тому ці правила вбудовані в кожну подію і їх не можна вимкнути.</p></div>
+    <ul>${item("Регламент фіксується до старту","Критерії й штрафи отримують цифровий відбиток SHA-256 — будь-хто може перевірити, що їх не змінили.")}
+    ${item("Відкритий протокол","Кожна оцінка, штраф і виправлення записуються з автором і часом. Нічого не видаляється — лише скасовується новим записом.")}
+    ${item("Право на апеляцію","Учасник оскаржує будь-який запис протоколу, а рішення судді бачать усі.")}
+    ${item("Без паперових протоколів","Регламент, бланки суддів і результати — лише цифрові: менше друку на кожному етапі.")}</ul></section>`;
 }
-const upcoming=()=>state.announcements.filter(a=>daysTo(a.date)>=0).sort((a,b)=>a.date.localeCompare(b.date));
-const statusTag=s=>s==="registration"?`<span class="tag"><span>Реєстрація відкрита</span></span>`:s==="vote"?`<span class="tag ink"><span>Голосування за трасу</span></span>`:`<span class="tag soft"><span>Незабаром</span></span>`;
-
-/* ============ views ============ */
 function vHome(){
-  const next=upcoming().find(a=>a.venueUniId)||upcoming()[0];
-  const u=next&&uni(next.venueUniId);
-  const vc=voteCounts(),total=state.votes.length,vRows=Object.entries(vc).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const voteAnn=state.announcements.find(a=>a.status==="vote");
-  const latest=[...state.builds].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,3);
-  const makers=state.suppliers.filter(s=>s.verified).length+state.universities.filter(u=>u.manufacture).length;
-  return`${next?`<section class="hero">
-    <div>
-      ${statusTag(next.status)}
-      <h1 style="margin-top:18px">${esc(next.title)}</h1>
-      <p class="lede">${esc(next.body)}</p>
-      <div class="when"><div><small>Дата</small><b>${dateParts(next.date).full}</b></div><div><small>Клас</small><b>${esc(next.cls)}</b></div><div><small>Траса</small><b>${u?esc(u.track.name):"обирається"}</b></div></div>
-      <div class="actions"><button class="btn red" data-go="race" data-race="teams"><span class="chev">Зареєструвати команду</span></button><button class="btn" data-go="news"><span>Усі анонси</span></button></div>
-    </div>
-    <div class="trackbox">
-      <div class="count">${Math.max(0,daysTo(next.date))}<small>${plural(Math.max(0,daysTo(next.date)),"день","дні","днів")} до старту${u?` · ${esc(u.name)}, ${esc(u.city)}`:""}</small></div>
-      ${trackSVG(u,{big:true})}
-    </div></section>`:""}
-  <div class="kerb" aria-hidden="true"></div>
-  <div class="stats"><div><b>${state.universities.length}</b><span>університетів із власними трасами</span></div><div><b>${state.builds.length}</b><span>відкритих конструкторів</span></div><div><b>${makers}</b><span>перевірених постачальників і виробників</span></div></div>
-  <div class="cols">
-    <section><div class="head"><h2 class="sec-title">Де наступний заїзд?</h2></div>
-      <p class="muted" style="margin:-12px 0 8px">${voteAnn?esc(voteAnn.title)+" · ":""}${total} ${plural(total,"голос","голоси","голосів")}</p>
-      ${vRows.map(([id,n],i)=>{const x=uni(id);return x?`<div class="vote-row ${i===0&&n>0?"lead":""}"><span><b>${esc(x.track.name)}</b> <span class="muted">· ${esc(x.city)}</span></span><span class="mono">${total?Math.round(n/total*100):0}%</span><div class="vb"><i style="width:${total?n/total*100:0}%"></i></div></div>`:""}).join("")}
-      <div class="actions"><button class="btn ink" data-go="tracks"><span class="chev">Голосувати за трасу</span></button></div>
-    </section>
-    <section><div class="head"><h2 class="sec-title">Оновлені конструктори</h2></div>
-      ${latest.map(b=>{const x=uni(b.uniId);return`<div class="vote-row" style="grid-template-columns:minmax(0,1fr) auto"><span><b>${esc(b.name)}</b> <span class="ver">v${b.version||1}</span><br><span class="muted" style="font-size:14px">${esc(x?x.name:"")} · ${esc(b.cls)}</span></span><button class="link" data-go="builds">Відкрити</button></div>`}).join("")||`<p class="empty">Ще немає конструкторів</p>`}
-    </section>
-  </div>`;
+  const live=S.events.find(e=>e.status==="live");
+  const next=S.events.filter(e=>e.status!=="finished"&&e.status!=="live").sort((a,b)=>a.date<b.date?-1:1);
+  const counts={};S.events.forEach(e=>counts[e.format]=(counts[e.format]||0)+1);
+  let lv="";
+  if(live){const r=results(live).rows.slice(0,5);
+    lv=`<div class="livecard cut"><div class="t"><div><span class="tag live"><span>Наживо</span></span><h3 style="margin-top:12px">${esc(live.title)}</h3><small>${esc(live.venue)}</small></div></div>
+    <ol>${r.map((x,i)=>`<li><b class="p">${i+1}</b><span>${esc(x.p.name)}<br><small>${esc(x.p.org)} · суддів ${x.judges} з ${live.judges.length}</small></span><span class="sc">${x.total==null?"—":num(x.total)}</span></li>`).join("")}</ol>
+    <div class="actions" style="margin-top:16px"><a class="btn red sm" href="#/e/${live.id}/results"><span>Результати наживо</span></a><a class="btn sm" style="border-color:#fff;color:#fff" href="#/e/${live.id}/protocol"><span>Відкритий протокол</span></a></div></div>`;}
+  const parts=S.events.reduce((a,e)=>a+e.participants.length,0);
+  const prot=S.events.reduce((a,e)=>a+e.protocol.length,0);
+  return`<section class="hero"><div>
+      <span class="tag ink"><span>Змагання · фестивалі · ліги</span></span>
+      <h1 style="margin-top:18px">Будь-яке змагання з журі — з чесним суддівством</h1>
+      <p class="lede">Регламент, реєстрація, оцінювання і результати в одному місці. Для інженерних перегонів, латте-арт фестивалів, хакатонів, робототехніки — і вашого власного формату.</p>
+      <div class="actions"><a class="btn red" href="#/create"><span>Створити подію за 5 хвилин</span></a><a class="btn" href="#/events"><span>Дивитися події</span></a></div>
+    </div>${lv}</section>
+    <div class="stats"><div><b>${Object.keys(FORMATS).length}</b><span>формати з готовими шаблонами</span></div><div><b>${S.events.length}</b><span>подій у демо</span></div><div><b>${parts}</b><span>учасників</span></div><div><b>${prot}</b><span>записів відкритого протоколу</span></div></div>
+    <section><div class="head"><h2 class="sec-title">Формати</h2><p class="muted" style="max-width:52ch">Ядро однакове — регламент, суддівство, протокол, рейтинг. Змінюються лише критерії та одиниці оцінювання.</p></div>
+      <div class="formats">${Object.entries(FORMATS).map(([k,F])=>`<a class="fmt" href="#/events?f=${k}" style="--c:${F.color}"><span class="ic">${ICONS[k]}</span><h3>${esc(F.name)}</h3><p>${esc(F.desc)}</p><span class="n">${counts[k]||0} подій →</span></a>`).join("")}</div></section>
+    <section><div class="head"><h2 class="sec-title">Найближчі події</h2><a class="btn sm" href="#/events"><span>Усі події</span></a></div>
+      <div class="g3">${next.slice(0,3).map(eventCard).join("")}</div></section>
+    <section><div class="head"><h2 class="sec-title">Як це працює</h2></div>
+      <div class="steps"><div><b>01</b><h3>Регламент</h3><p>Обираєте формат — критерії й штрафи вже заповнені. Публікуєте і фіксуєте до старту.</p></div>
+      <div><b>02</b><h3>Реєстрація</h3><p>Команди, бариста чи учасники реєструються онлайн, організатор підтверджує допуск.</p></div>
+      <div><b>03</b><h3>Суддівство</h3><p>Судді ставлять бали або фіксують час з телефона. Кожна дія — у відкритому протоколі.</p></div>
+      <div><b>04</b><h3>Результати й ліга</h3><p>Табло оновлюється наживо, апеляції розглядаються публічно, бали йдуть у рейтинг сезону.</p></div></div></section>
+    <section>${ethicBlock()}</section>`;
+}
+function vEvents(q){
+  const f=q.get("f")||"all";
+  const list=S.events.filter(e=>f==="all"||e.format===f).sort((a,b)=>{const o={live:0,registration:1,announced:2,finished:3};return o[a.status]-o[b.status]||(a.date<b.date?-1:1)});
+  return`<div class="head"><div><h1>Події</h1><p class="lede">Перегони, фестивалі, хакатони й турніри на одній платформі.</p></div></div>
+    <div class="chips" style="margin-bottom:24px" role="group" aria-label="Формат"><a class="chip" href="#/events" aria-pressed="${f==="all"}">Усі</a>${Object.entries(FORMATS).map(([k,F])=>`<a class="chip" href="#/events?f=${k}" aria-pressed="${f===k}"><i class="fmt-dot" style="--c:${F.color}"></i>${esc(F.short)}</a>`).join("")}</div>
+    ${list.length?`<div class="g3">${list.map(eventCard).join("")}</div>`:`<p class="empty">Подій цього формату поки немає. <a href="#/create">Створіть першу</a>.</p>`}`;
 }
 
-function vNews(){
-  const list=[...state.announcements].sort((a,b)=>a.date.localeCompare(b.date));
-  return`<div class="head"><div><h1>Анонси змагань</h1><p class="lede">Етапи ліги, дати, класи машин і траси. Реєстрація і техком відкриваються тут же.</p></div></div>
-  ${list.map(a=>{const p=dateParts(a.date),u=uni(a.venueUniId);return`<article class="ann">
-    <div class="date"><b>${p.day}</b><span>${p.mon} ${a.date.slice(0,4)}</span></div>
-    <div>${statusTag(a.status)}<h3>${esc(a.title)}</h3><div class="muted" style="font-size:14px">${esc(a.cls)} · ${u?`${esc(u.track.name)}, ${esc(u.city)}`:"траса визначається голосуванням"}</div><p style="margin:8px 0 0;max-width:62ch">${esc(a.body)}</p></div>
-    <div class="act">${a.status==="registration"?`<button class="btn red" data-go="race" data-race="teams"><span class="chev">Реєстрація</span></button>`:a.status==="vote"?`<button class="btn ink" data-go="tracks"><span class="chev">Голосувати</span></button>`:`<button class="btn" data-go="tracks"><span>Про трасу</span></button>`}</div>
-  </article>`}).join("")||`<p class="empty">Анонсів поки немає</p>`}`;
+/* ---- event page ---- */
+const TABS=[["overview","Огляд"],["rules","Регламент"],["participants","Учасники"],["judging","Суддівство"],["protocol","Протокол"],["results","Результати"]];
+function vEvent(id,tab){
+  const e=ev(id);if(!e)return`<p class="empty">Подію не знайдено. <a href="#/events">До списку подій</a></p>`;
+  const F=FORMATS[e.format];document.documentElement.style.setProperty("--accent",F.color);
+  const openAp=e.appeals.filter(a=>a.status==="open").length;
+  const cnt={participants:e.participants.length,protocol:e.protocol.length,results:"",judging:""};
+  const body={overview:tOverview,rules:tRules,participants:tParticipants,judging:tJudging,protocol:tProtocol,results:tResults}[tab]||tOverview;
+  return`<div class="ehead"><div><p class="crumbs"><a href="#/events">Події</a> / <a href="#/events?f=${e.format}">${esc(F.name)}</a></p>
+      <div class="chips">${e.status==="live"?`<span class="tag live"><span>Наживо</span></span>`:fmtTag(e.format)}${e.status!=="live"?statusTxt(e):""}</div>
+      <h1 style="margin-top:14px">${esc(e.title)}</h1>
+      <div class="meta"><div><small>Дата</small><b>${dateUa(e.date)}</b></div><div><small>Місце</small><b>${esc(e.city)} · ${esc(e.venue)}</b></div><div><small>Організатор</small><b>${esc(e.organizer||"—")}</b></div></div></div>
+      <div class="notkiosk">${e.status==="registration"?`<a class="btn red" href="#/e/${e.id}/participants"><span>Зареєструватися</span></a>`:e.status==="live"?`<a class="btn red" href="#/e/${e.id}/results"><span>Табло наживо</span></a>`:""}</div></div>
+    <nav class="tabs" aria-label="Розділи події">${TABS.map(([k,l])=>`<a href="#/e/${e.id}/${k}" aria-current="${k===tab||(!tab&&k==="overview")}">${l}${k==="protocol"&&openAp?`<span class="cnt">${openAp} апел.</span>`:cnt[k]?`<span class="cnt">${cnt[k]}</span>`:""}</a>`).join("")}</nav>
+    ${body(e,F)}`;
+}
+function lockBox(e){
+  if(!e.locked)return`<div class="lock">${ICONS.lock}<div><b>Регламент ще не зафіксовано</b><span class="muted">Після фіксації критерії й штрафи отримають відбиток SHA-256.</span></div></div>`;
+  return`<div class="lock">${ICONS.lock}<div style="min-width:0"><b>Регламент зафіксовано ${dtUa(e.locked.at)}</b>
+    <span class="muted">Цифровий відбиток SHA-256 критеріїв, штрафів і правил:</span><div class="h">${esc(e.locked.hash||"обчислюється…")}</div>
+    <div class="actions" style="margin-top:10px"><button class="btn sm" type="button" data-a="verify" data-id="${e.id}"><span>Перевірити відбиток</span></button><span id="verifyOut" class="hint" role="status"></span></div>
+    ${e.regHistory.length?`<p class="hint">Версій регламенту: ${e.regHistory.length+1}. ${e.regHistory.map(h=>`${dtUa(h.at)} — ${esc(h.reason)}`).join("; ")}</p>`:""}</div></div>`;
+}
+function tOverview(e,F){
+  const R=results(e);const judged=Object.keys(e.scores).length+new Set(e.laps.map(l=>l.pid)).size;
+  const top=R.rows.filter(x=>(x.best??x.total)!=null).slice(0,3);
+  return`<div class="cols"><div>
+      <div class="kv"><div><b>${e.participants.length}</b><span>${esc(F.units)}</span></div><div><b>${e.judges.filter(j=>!/формується/.test(j)).length||"—"}</b><span>суддів</span></div><div><b>${F.scoring==="time"?"час":R.max}</b><span>${F.scoring==="time"?"найкраще коло":"макс. балів"}</span></div></div>
+      <div class="panel" style="margin-top:20px"><h2 class="sec-title" style="font-size:20px">Правила</h2><ul class="crit" style="margin-top:8px">${e.rules.map(r=>`<li><span style="color:var(--ink)">${esc(r)}</span></li>`).join("")}</ul></div>
+    </div><div>
+      ${lockBox(e)}
+      ${top.length?`<div class="panel"><h2 class="sec-title" style="font-size:20px">${e.status==="live"?"Лідери зараз":"Подіум"}</h2><ol class="plist" style="margin-top:6px">${top.map((x,i)=>`<li><div><b>${i+1}. ${esc(x.p.name)}</b><small>${esc(x.p.org)}</small></div><span class="mono">${R.type==="time"?fmtMs(x.best):num(x.total)}</span></li>`).join("")}</ol><div class="actions"><a class="btn sm" href="#/e/${e.id}/results"><span>Усі результати</span></a></div></div>`:
+      `<div class="panel"><h2 class="sec-title" style="font-size:20px">Оцінювання</h2><p class="muted" style="margin-top:8px">${judged?"":"Оцінювання ще не почалося. "}Критерії вже опубліковано — учасники знають правила заздалегідь.</p><div class="actions"><a class="btn sm" href="#/e/${e.id}/rules"><span>Переглянути критерії</span></a></div></div>`}
+    </div></div>`;
+}
+function tRules(e,F){
+  return`<div class="cols"><div>${lockBox(e)}
+    <div class="panel"><h2 class="sec-title" style="font-size:20px">Критерії оцінювання</h2>
+      <ul class="crit" style="margin-top:8px">${e.criteria.map(c=>`<li><span style="color:var(--ink);font-weight:600">${esc(c.name)}</span><b>${F.scoring==="time"?"хв:с.мс":`0–${c.max}`}</b></li>`).join("")}</ul>
+      ${F.scoring==="points"?`<p class="hint">Підсумок — середнє суддів, максимум ${e.criteria.reduce((a,c)=>a+(+c.max||0),0)} балів, мінус штрафи.</p>`:`<p class="hint">Зараховується найкраще коло з урахуванням штрафних секунд.</p>`}</div>
+    <div class="panel"><h2 class="sec-title" style="font-size:20px">Штрафи</h2><ul class="crit" style="margin-top:8px">${e.penalties.map(p=>`<li><span style="color:var(--ink);font-weight:600">${esc(p.name)}</span><b>${F.scoring==="time"?"+":"−"}${p.v} ${esc(F.penUnit)}</b></li>`).join("")}</ul></div></div>
+    <div><div class="panel"><h2 class="sec-title" style="font-size:20px">Правила</h2><ul class="crit" style="margin-top:8px">${e.rules.map(r=>`<li><span style="color:var(--ink)">${esc(r)}</span></li>`).join("")}</ul></div>
+    <div class="panel"><h3>Змінити регламент після фіксації</h3><p class="muted" style="margin-top:6px;font-size:14px">Зміна можлива лише з причиною: створюється нова версія з новим відбитком, а стара лишається в історії.</p>
+      <form data-form="regchange" data-id="${e.id}"><label for="rc-crit">Критерій</label><select id="rc-crit" name="crit">${e.criteria.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}</select>
+      ${F.scoring==="points"?`<label for="rc-max">Новий максимум</label><input id="rc-max" name="max" type="number" min="1" max="100" required>`:`<label for="rc-name">Нова назва</label><input id="rc-name" name="name" required>`}
+      <label for="rc-reason">Причина зміни</label><input id="rc-reason" name="reason" required minlength="8" placeholder="Наприклад: узгоджено з усіма командами 12.11">
+      <div class="actions"><button class="btn sm" type="submit"><span>Створити нову версію</span></button></div></form></div></div></div>`;
+}
+function tParticipants(e,F){
+  const can=e.status==="registration"||e.status==="announced";
+  return`<div class="cols"><div><div class="head" style="margin-bottom:8px"><h2 class="sec-title">${esc(F.unit==="Бариста"?"Бариста":"Учасники")}</h2><span class="muted">${e.participants.filter(p=>p.status==="confirmed").length} підтверджено з ${e.participants.length}</span></div>
+    ${e.participants.length?`<ul class="plist">${e.participants.map(p=>`<li><div><b>${esc(p.name)}</b><small>${esc(p.org)}${F.fields.map(f=>p[f.id]?` · ${esc(p[f.id])}${f.id==="mass"?" кг":""}`:"").join("")}</small></div>
+      <div>${p.status==="confirmed"?`<span class="ok">Допущено</span>`:`<span class="wait">Очікує допуску</span> <button class="link" data-a="confirm" data-id="${e.id}" data-p="${p.id}">Підтвердити</button>`}</div></li>`).join("")}</ul>`:`<p class="empty">Ще ніхто не зареєструвався</p>`}</div>
+    <div>${can?`<div class="panel"><h2 class="sec-title" style="font-size:20px">Реєстрація</h2>
+      <form data-form="register" data-id="${e.id}"><label for="r-name">${F.unit==="Бариста"?"Ім'я та прізвище":"Назва команди"}</label><input id="r-name" name="name" required maxlength="60">
+      <label for="r-org">${esc(F.org)}</label><input id="r-org" name="org" required maxlength="80">
+      ${F.fields.map(f=>`<label for="r-${f.id}">${esc(f.label)}</label><input id="r-${f.id}" name="${f.id}" ${f.type==="number"?'type="number" step="0.1" min="0"':""} maxlength="80">`).join("")}
+      <label class="check"><input type="checkbox" name="agree" required> Ознайомився з регламентом (відбиток ${esc((e.locked&&e.locked.hash||"").slice(0,10))}…)</label>
+      <div class="actions"><button class="btn red" type="submit"><span>Подати заявку</span></button></div></form></div>`:
+      `<div class="panel"><h3>Реєстрацію закрито</h3><p class="muted" style="margin-top:6px">Подія ${e.status==="live"?"вже триває":"завершилася"}.</p></div>`}</div></div>`;
+}
+let watch={run:false,start:0,raf:0,ms:null};
+function tJudging(e,F){
+  const conf=e.participants.filter(p=>p.status==="confirmed");
+  const judges=e.judges.filter(j=>!/формується/.test(j));
+  if(!judges.length||!conf.length)return`<p class="empty">Суддівство відкриється, коли буде сформовано журі й підтверджено учасників.</p>`;
+  const jSel=ui.judge&&judges.includes(ui.judge)?ui.judge:judges[0];
+  const pSel=ui.pid&&conf.some(p=>p.id===ui.pid)?ui.pid:conf[0].id;
+  const pick=`<div class="row"><div><label for="j-judge">Суддя</label><select id="j-judge" data-ui="judge">${judges.map(j=>`<option ${j===jSel?"selected":""}>${esc(j)}</option>`).join("")}</select></div>
+     <div><label for="j-p">${esc(F.unit)}</label><select id="j-p" data-ui="pid">${conf.map(p=>`<option value="${p.id}" ${p.id===pSel?"selected":""}>${esc(p.name)} — ${esc(p.org)}</option>`).join("")}</select></div></div>`;
+  if(F.scoring==="time"){
+    return`<div class="cols"><div class="panel"><h2 class="sec-title" style="font-size:20px">Хронометраж</h2>${pick}
+      <div class="clock mono ${watch.run?"run":""}" id="clock" aria-live="off">${fmtMs(watch.run?performance.now()-watch.start:watch.ms||0)}</div>
+      <div class="actions"><button class="btn ${watch.run?"":"red"}" type="button" data-a="watch"><span>${watch.run?"Стоп":"Старт"}</span></button></div>
+      <form data-form="lap" data-id="${e.id}" style="margin-top:6px"><label for="lap-t">Час кола (або введіть вручну)</label><input id="lap-t" name="t" class="mono" placeholder="0:41.620" value="${watch.ms?fmtMs(watch.ms):""}">
+      <label for="lap-p">Штраф</label><select id="lap-p" name="pen"><option value="">Без штрафу</option>${e.penalties.map(p=>`<option value="${p.id}">${esc(p.name)} (+${p.v} с)</option>`).join("")}</select>
+      <div class="actions"><button class="btn red" type="submit"><span>Зарахувати коло</span></button></div></form></div>
+      <div><h2 class="sec-title" style="font-size:20px;margin-bottom:8px">Останні кола</h2>${lapList(e)}</div></div>`;
+  }
+  const prev=(e.scores[pSel]||{})[jSel];
+  return`<div class="cols"><div class="panel"><h2 class="sec-title" style="font-size:20px">Бланк судді</h2>${pick}
+    <form data-form="score" data-id="${e.id}" data-judge="${esc(jSel)}" data-p="${pSel}"><div class="scoregrid">${e.criteria.map(c=>`<label for="s-${c.id}">${esc(c.name)}<small>0–${c.max}</small></label><input id="s-${c.id}" name="${c.id}" type="number" min="0" max="${c.max}" step="0.5" required value="${prev?esc(prev[c.id]):""}" class="mono">`).join("")}</div>
+    ${prev?`<label for="s-reason">Причина виправлення (обов'язково — запис піде в протокол)</label><input id="s-reason" name="reason" required minlength="6" placeholder="Що змінилося і чому">`:""}
+    <div class="actions"><button class="btn red" type="submit"><span>${prev?"Зберегти виправлення":"Зберегти оцінку"}</span></button></div></form></div>
+    <div class="panel"><h2 class="sec-title" style="font-size:20px">Штраф</h2><p class="muted" style="font-size:14px;margin-top:6px">Штраф записується в протокол з вашим ім'ям, учасник може його оскаржити.</p>
+    <form data-form="penalty" data-id="${e.id}" data-judge="${esc(jSel)}" data-p="${pSel}"><label for="pen-id">Порушення</label><select id="pen-id" name="pen">${e.penalties.map(p=>`<option value="${p.id}">${esc(p.name)} (−${p.v} ${esc(F.penUnit)})</option>`).join("")}</select>
+    <label for="pen-note">Коментар</label><input id="pen-note" name="note" maxlength="140" placeholder="Що саме сталося">
+    <div class="actions"><button class="btn" type="submit"><span>Записати штраф</span></button></div></form></div></div>`;
+}
+function lapList(e){
+  const laps=e.laps.slice(-8).reverse();
+  if(!laps.length)return`<p class="empty">Ще немає кіл</p>`;
+  return`<ul class="plist">${laps.map(l=>{const p=part(e,l.pid);return`<li><div><b>${esc(p?p.name:"?")}</b><small class="mono">${fmtMs(l.ms)}${l.pen?` + ${l.pen} с`:""}${l.void?" · скасовано":""}</small></div>${l.void?"":`<button class="link" data-a="void-lap" data-id="${e.id}" data-l="${l.id}">Скасувати</button>`}</li>`}).join("")}</ul>`;
+}
+function tProtocol(e,F){
+  const filt=ui.pf||"all";
+  const list=e.protocol.filter(x=>filt==="all"||(filt==="edits"?["edit","void","resolve"].includes(x.kind):filt==="appeals"?["appeal","resolve"].includes(x.kind):filt==="penalty"?x.kind==="penalty":true)).slice().reverse();
+  const KN={score:"оцінка",lap:"коло",edit:"виправлення",penalty:"штраф",appeal:"апеляція",resolve:"рішення",void:"скасування",reg:"регламент"};
+  const head=e.judges[0];
+  const aps=e.appeals.slice().reverse();
+  return`<div class="trust" id="trustBox"><p>Чи довіряли б ви результатам, якби бачили такий протокол?</p><div class="chips" role="group" aria-label="Відповідь">${["Так","Скоріше так","Ні"].map(a=>`<button class="chip" type="button" data-a="trust" data-v="${a}">${a}</button>`).join("")}</div></div>
+    ${aps.length?`<h2 class="sec-title" style="font-size:20px;margin-bottom:12px">Апеляції</h2>${aps.map(a=>{const p=part(e,a.pid);return`<div class="appeal"><div class="row" style="align-items:center"><div><b>${esc(a.by)}</b> <span class="muted">· ${dtUa(a.t)}</span></div><span class="s ${a.status}" style="flex:0 0 auto">${a.status==="open"?"На розгляді":a.status==="accepted"?"Прийнято":"Відхилено"}</span></div>
+      <p style="margin-top:6px">«${esc(a.reason)}»</p>${a.reply?`<p class="hint">Рішення: ${esc(a.reply)}</p>`:""}
+      ${a.status==="open"?`<form data-form="resolve" data-id="${e.id}" data-ap="${a.id}" class="row" style="margin-top:10px;align-items:flex-end"><div style="flex:3"><label for="rep-${a.id}">Рішення головного судді (${esc(head)})</label><input id="rep-${a.id}" name="reply" required minlength="6" placeholder="Що перевірили і чому таке рішення"></div><div class="actions" style="margin:0;flex:0 0 auto"><button class="btn sm red" name="d" value="accepted" type="submit"><span>Прийняти</span></button><button class="btn sm" name="d" value="rejected" type="submit"><span>Відхилити</span></button></div></form>`:""}</div>`}).join("")}`:""}
+    <div class="head" style="margin:28px 0 8px"><h2 class="sec-title" style="font-size:20px">Протокол · ${e.protocol.length} записів</h2>
+      <div class="chips" role="group" aria-label="Фільтр">${[["all","Усі"],["penalty","Штрафи"],["edits","Виправлення"],["appeals","Апеляції"]].map(([k,l])=>`<button class="chip" type="button" data-a="pf" data-v="${k}" aria-pressed="${filt===k}">${l}</button>`).join("")}</div></div>
+    <p class="hint" style="margin-bottom:6px">Записи не видаляються: виправлення й скасування додаються новими рядками.</p>
+    ${list.length?`<ol class="plog">${list.map(x=>{const p=x.pid?part(e,x.pid):null;const canAp=(x.kind==="penalty"||x.kind==="score"||x.kind==="lap"||x.kind==="edit")&&p&&!x.voided&&!e.appeals.some(a=>a.entryId===x.id&&a.status==="open");
+      return`<li><span class="t">${timeOf(x.t)}<br>${new Date(x.t).getDate()}.${String(new Date(x.t).getMonth()+1).padStart(2,"0")}</span>
+      <div><span class="k ${x.kind}">${KN[x.kind]||x.kind}</span>${p?`<b>${esc(p.name)}</b> — `:""}${x.voided?`<span class="old">${x.text}</span> <span class="muted">(скасовано)</span>`:x.text}<div class="who">записав(ла): ${esc(x.who)}</div></div>
+      <div>${canAp?`<button class="link" data-a="appeal-open" data-l="${x.id}">Оскаржити</button>`:""}</div>
+      ${ui.appealFor===x.id?`<form class="af panel" data-form="appeal" data-id="${e.id}" data-l="${x.id}"><label for="ap-r">Чому ви не згодні з цим записом</label><textarea id="ap-r" name="reason" required minlength="10" maxlength="400" placeholder="Наприклад: є відео, де видно…"></textarea><div class="actions"><button class="btn sm red" type="submit"><span>Подати апеляцію</span></button><button class="link" type="button" data-a="appeal-cancel">Скасувати</button></div></form>`:""}</li>`}).join("")}</ol>`:`<p class="empty">Записів цього типу немає</p>`}`;
+}
+function tResults(e,F){
+  const R=results(e);
+  const rows=R.rows;
+  const head=R.type==="time"?`<th class="pos">Поз.</th><th>${esc(F.unit)}</th><th class="num">Найкраще коло</th><th class="num">Відставання</th><th class="num">Кіл</th><th class="num">Штрафи</th>`:
+    `<th class="pos">Поз.</th><th>${esc(F.unit)}</th><th class="num">Середнє суддів</th><th class="num">Штрафи</th><th class="num">Підсумок</th><th>Суддів</th>`;
+  const body=rows.map((x,i)=>{const done=(x.best??x.total)!=null;
+    if(R.type==="time")return`<tr class="${i===0&&done?"p1":""}"><td class="pos"><span><b>${done?i+1:"–"}</b></span></td><td class="tname">${esc(x.p.name)}<small>${esc(x.p.org)} · ${esc(x.p.vehicle||"")}</small></td><td class="num mono">${fmtMs(x.best)}</td><td class="num mono">${x.gap?`+${(x.gap/1000).toFixed(3).replace(".",",")}`:done?"лідер":"—"}</td><td class="num mono">${x.laps}</td><td class="num mono">${x.penSum?`+${x.penSum} с`:"—"}</td></tr>`;
+    return`<tr class="${i===0&&done?"p1":""}"><td class="pos"><span><b>${done?i+1:"–"}</b></span></td><td class="tname">${esc(x.p.name)}<small>${esc(x.p.org)}${x.p.pattern?` · ${esc(x.p.pattern)}`:""}</small>
+      ${x.judges?`<details class="bd"><summary>бали суддів</summary><table>${Object.entries(x.by).map(([j,sc])=>`<tr><td>${esc(j.replace(/ \(.*\)/,""))}</td>${e.criteria.map(c=>`<td class="mono">${String(sc[c.id]).replace(".",",")}</td>`).join("")}<td class="mono"><b>${num(e.criteria.reduce((a,c)=>a+(+sc[c.id]||0),0))}</b></td></tr>`).join("")}</table></details>`:""}</td>
+      <td class="num mono">${x.avg==null?"—":num(x.avg)}</td><td class="num mono">${x.pen?`−${x.pen}`:"—"}</td><td class="num mono"><b>${x.total==null?"—":num(x.total)}</b></td><td class="mono">${x.judges} з ${e.judges.length}</td></tr>`}).join("");
+  return`<div class="head notkiosk" style="margin-bottom:12px"><p class="muted">${R.type==="time"?"Найкраще коло з урахуванням штрафних секунд.":`Середнє суддів з ${R.max} мінус штрафи.`} ${e.status==="live"?"Оновлюється після кожної оцінки.":""}</p>
+      <div class="actions" style="margin:0"><button class="btn sm" type="button" data-a="kiosk"><span>Режим табло</span></button><button class="btn sm" type="button" data-a="csv" data-id="${e.id}"><span>CSV протоколу</span></button></div></div>
+    ${rows.length?`<div class="tower scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`:`<p class="empty">Результатів ще немає</p>`}`;
 }
 
-function vTracks(){
-  const vc=voteCounts(),total=state.votes.length,mine=(state.votes.find(v=>v.id===uid)||{}).uniId;
-  const voteAnn=state.announcements.find(a=>a.status==="vote");
-  const max=Math.max(0,...Object.values(vc));
-  return`<div class="head"><div><h1>Траси університетів</h1><p class="lede">Кожен університет проєктує власну трасу. ${voteAnn?`Зараз обираємо місце для етапу «${esc(voteAnn.title)}» — один голос на людину, його можна змінити.`:""}</p></div>
-  <div class="mono muted">${total} ${plural(total,"голос","голоси","голосів")}</div></div>
-  <div class="g3">${[...state.universities].sort((a,b)=>(a.order||0)-(b.order||0)).map(u=>{const n=vc[u.id]||0,pct=total?Math.round(n/total*100):0,isMine=mine===u.id,lead=n>0&&n===max;
-    return`<article class="card cut track-card ${isMine?"mine":""}">
-      <div class="top"><div><h3>${esc(u.track.name)}</h3><div class="muted" style="font-size:13px">${esc(u.name)} · ${esc(u.city)}</div></div>${lead?`<span class="tag"><span>Лідер</span></span>`:""}</div>
-      ${trackSVG(u)}
-      <div class="spec"><span>Довжина <b>${u.track.lengthM} м</b></span><span>Поворотів <b>${u.track.turns}</b></span></div>
-      <div class="vote-row ${lead?"lead":""}" style="border:0;padding:4px 0"><span class="muted" style="font-size:13px">${n} ${plural(n,"голос","голоси","голосів")}</span><span class="mono">${pct}%</span><div class="vb"><i style="width:${pct}%"></i></div></div>
-      <div>${isMine?`<button class="btn sm" disabled><span>Ваш голос</span></button>`:`<button class="btn ${mine?"":"red"} sm" data-a="vote" data-id="${esc(u.id)}"><span>${mine?"Змінити голос":"Голосувати"}</span></button>`}</div>
-    </article>`}).join("")}</div>`;
+/* ---- league ---- */
+function vLeague(q){
+  const f=q.get("f")&&FORMATS[q.get("f")]?q.get("f"):"race";
+  const st=standings(f);const F=FORMATS[f];const max=st.rows[0]?st.rows[0].pts:1;
+  return`<div class="head"><div><h1>Рейтинг сезону</h1><p class="lede">Бали за місце на кожній події (25, 18, 15, 12, 10…) складаються в сезонний рейтинг ${f==="race"?"університетів":f==="latte"?"кав'ярень":"організацій"}. Варіант «Ліга для кожного університету» посів друге місце в тестуванні, тому ліга — рівень над подіями.</p></div></div>
+    <div class="chips" style="margin-bottom:24px" role="group" aria-label="Формат">${Object.entries(FORMATS).map(([k,X])=>`<a class="chip" href="#/league?f=${k}" aria-pressed="${f===k}"><i class="fmt-dot" style="--c:${X.color}"></i>${esc(X.short)}</a>`).join("")}</div>
+    ${st.rows.length?`<div class="cols"><div>${st.rows.map((r,i)=>`<div class="lrow" style="--c:${F.color}"><span class="pos"><span style="${i===0?"background:var(--red)":""}"><b>${i+1}</b></span></span><div><b class="tname" style="font-size:16px">${esc(r.org)}</b><small class="muted" style="display:block;font-size:13px">подій: ${r.events.size} · найкраще місце: ${r.best}</small></div><b class="mono" style="font-size:20px">${r.pts}</b><div class="bar"><i style="width:${Math.round(r.pts/max*100)}%"></i></div></div>`).join("")}</div>
+      <div class="panel"><h3>Як рахується</h3><p class="muted" style="margin-top:8px;font-size:14px">Враховано подій: ${st.evs}. Якщо від організації виступає кілька учасників, бали складаються. Подія наживо враховується за поточною таблицею.</p><div class="actions"><a class="btn sm" href="#/events?f=${f}"><span>Події формату</span></a></div></div></div>`:
+      `<p class="empty">У сезоні ще немає завершених подій формату «${esc(F.name)}».</p>`}`;
 }
 
-function buildForm(){
-  const b=ui.editBuild==="new"?{name:"",uniId:state.universities[0]?.id||"",cls:"Міні-боліди 1:10",mass:"",motor:"",battery:"",drive:"",sensors:"",license:"Відкрита",desc:""}:state.builds.find(x=>x.id===ui.editBuild);
-  if(!b)return"";const F="build";
-  const inp=(f,l,type="text")=>`<div><label for="f_b_${f}">${l}</label><input id="f_b_${f}" data-form="${F}" data-f="${f}" type="${type}" ${type==="number"?'step="0.01" min="0"':""} value="${esc(d(F,f,b[f]))}"></div>`;
-  return`<section class="panel" style="margin-bottom:28px"><h2 class="sec-title">${ui.editBuild==="new"?"Новий конструктор":`Редагування: ${esc(b.name)} · v${b.version||1}`}</h2>
-    <div class="row">${inp("name","Назва машини")}<div><label for="f_b_uniId">Університет</label><select id="f_b_uniId" data-form="${F}" data-f="uniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"uniId",b.uniId)===u.id?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>
-    <div><label for="f_b_cls">Клас</label><select id="f_b_cls" data-form="${F}" data-f="cls">${Object.keys(CLASSES).map(c=>`<option ${d(F,"cls",b.cls)===c?"selected":""}>${c}</option>`).join("")}</select></div></div>
-    <div class="row">${inp("mass","Маса, кг","number")}${inp("motor","Мотор")}${inp("battery","Батарея")}</div>
-    <div class="row">${inp("drive","Привід")}${inp("sensors","Датчики")}<div><label for="f_b_license">Доступ до креслень</label><select id="f_b_license" data-form="${F}" data-f="license">${["Відкрита","За запитом"].map(o=>`<option ${d(F,"license",b.license)===o?"selected":""}>${o}</option>`).join("")}</select></div></div>
-    ${ui.editBuild!=="new"?`<div><label for="f_b_note">Що змінилось у цій версії</label><input id="f_b_note" data-form="${F}" data-f="note" value="${esc(d(F,"note",""))}"></div>`:""}
-    <div class="actions"><button class="btn red" data-a="save-build"><span>${ui.editBuild==="new"?"Опублікувати конструктор":`Зберегти як v${(b.version||1)+1}`}</span></button><button class="btn" data-a="cancel-build"><span>Скасувати</span></button></div>
-  </section>`;
+/* ---- organizers + wizard ---- */
+function vOrganizers(){
+  return`<div class="head"><div><h1>Для організаторів</h1><p class="lede">Студради, кафедри, кав'ярні, фестивалі й спільноти: проведіть подію з журі без таблиць, чатів і паперових бланків.</p></div><a class="btn red" href="#/create"><span>Створити подію</span></a></div>
+    <div class="formats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="fmt" style="--c:var(--red)"><span class="ic">${ICONS.shield}</span><h3>Чесне суддівство</h3><p>Фіксація регламенту, відкритий протокол, апеляції. Ядро продукту — його обрали 58% у порівняльному тесті.</p></div>
+      <div class="fmt" style="--c:var(--purple)"><span class="ic">${ICONS.plus}</span><h3>Ліга і сезон</h3><p>Кожна подія додає бали в сезонний рейтинг — учасники повертаються регулярно, а не разово.</p></div>
+      <div class="fmt" style="--c:var(--ink)"><span class="ic">${ICONS.hack}</span><h3>Усе в одному місці</h3><p>Регламент, реєстрація, бланки суддів і табло — з шаблону формату, без копіювання торішніх файлів.</p></div></div>
+    <section><div class="head"><h2 class="sec-title">Чому формати різні, а ядро одне</h2></div>
+    <div class="tower scroll"><table><thead><tr><th>Формат</th><th>Хто змагається</th><th>Як оцінюють</th><th>Штрафи з шаблону</th></tr></thead><tbody>
+    ${Object.values(FORMATS).map(F=>`<tr><td class="tname" style="font-size:15px">${esc(F.name)}</td><td>${esc(F.unit)}</td><td>${F.scoring==="time"?"хронометраж, найкраще коло":F.criteria.map(c=>esc(c.name)).join(", ")}</td><td>${F.penalties.map(p=>esc(p.name)).join(", ")}</td></tr>`).join("")}</tbody></table></div></section>
+    <section>${ethicBlock()}</section>`;
 }
-function vBuilds(){
-  const f=ui.buildFilter,list=state.builds.filter(b=>f==="all"||b.cls===f).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-  return`<div class="head"><div><h1>Конструктори</h1><p class="lede">Університети публікують свої машини: специфікації, версії, доступ до креслень. Беріть за основу, покращуйте, випускайте нову версію.</p></div>
-  ${ui.editBuild?"":`<button class="btn red" data-a="new-build"><span>Додати конструктор</span></button>`}</div>
-  ${ui.editBuild?buildForm():""}
-  <div class="chips" style="margin-bottom:24px">${["all",...Object.keys(CLASSES)].map(c=>`<button class="chip" aria-pressed="${f===c}" data-a="bfilter" data-v="${esc(c)}">${c==="all"?"Усі класи":esc(c)}</button>`).join("")}</div>
-  <div class="g3">${list.map(b=>{const u=uni(b.uniId);return`<article class="card cut build">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><h3 style="font-size:22px">${esc(b.name)}</h3><div class="muted" style="font-size:13px">${esc(u?u.name:"")}</div></div><span class="ver">v${b.version||1}</span></div>
-    <span class="tag soft" style="align-self:flex-start"><span>${esc(b.cls)}</span></span>
-    <dl><dt>Маса</dt><dd class="mono">${esc(b.mass)} кг</dd><dt>Мотор</dt><dd>${esc(b.motor)}</dd><dt>Батарея</dt><dd>${esc(b.battery)}</dd><dt>Привід</dt><dd>${esc(b.drive)}</dd><dt>Датчики</dt><dd>${esc(b.sensors)}</dd><dt>Креслення</dt><dd>${esc(b.license)}</dd></dl>
-    ${b.note?`<p style="margin:0;font-size:13px"><span class="muted">Остання зміна:</span> ${esc(b.note)}</p>`:""}
-    <div class="foot"><span class="muted">Оновлено ${b.updatedAt?new Date(b.updatedAt).toLocaleDateString("uk-UA"):"—"}</span><button class="btn sm" data-a="edit-build" data-id="${esc(b.id)}"><span>Редагувати</span></button></div>
-  </article>`}).join("")||`<p class="empty">У цьому класі ще немає конструкторів. Додайте перший.</p>`}</div>`;
-}
-
-function vMakers(){
-  const f=ui.makerFilter;
-  const items=[...state.suppliers.map(s=>({...s,kind:"supplier"})),...state.universities.filter(u=>u.manufacture).map(u=>({id:u.id,name:u.name,city:u.city,category:"Університет-виробник",offers:u.capabilities,verified:u.verified,kind:"uni"}))]
-    .filter(x=>f==="all"||x.kind===f).sort((a,b)=>(b.verified-a.verified)||a.name.localeCompare(b.name,"uk"));
-  return`<div class="head"><div><h1>Постачальники і виробники</h1><p class="lede">Компанії та університетські лабораторії, які постачають компоненти й виготовляють деталі під регламент ліги. Позначка означає, що LovkoTech перевірив виробника.</p></div></div>
-  <div class="chips" style="margin-bottom:24px">${[["all","Усі"],["supplier","Постачальники"],["uni","Університети-виробники"]].map(([v,l])=>`<button class="chip" aria-pressed="${f===v}" data-a="mfilter" data-v="${v}">${l}</button>`).join("")}</div>
-  <div class="g3">${items.map(x=>`<article class="card cut" style="display:flex;flex-direction:column;gap:10px">
-    <div style="display:flex;justify-content:space-between;gap:10px"><h3>${esc(x.name)}</h3>${x.verified?`<span class="verified">${verifiedMark}Перевірено</span>`:`<span class="pending">На перевірці</span>`}</div>
-    <div class="muted" style="font-size:13px">${esc(x.category)} · ${esc(x.city)}</div>
-    <p style="margin:0;font-size:14px">${esc(x.offers)}</p>
-    <div style="margin-top:auto;padding-top:8px"><button class="btn sm" data-a="contact" data-name="${esc(x.name)}"><span>${x.kind==="uni"?"Замовити деталь":"Запросити пропозицію"}</span></button></div>
-  </article>`).join("")||`<p class="empty">Нікого не знайдено</p>`}</div>`;
+let wiz={step:1,format:null,title:"",city:"",venue:"",date:"",organizer:"",criteria:[],penalties:[]};
+function vCreate(){
+  const st=["Формат","Деталі","Критерії","Публікація"];
+  const W=wiz;const F=W.format&&FORMATS[W.format];
+  let body="";
+  if(W.step===1)body=`<h2 class="sec-title" style="margin-bottom:16px">Оберіть формат</h2><div class="pick">${Object.entries(FORMATS).map(([k,X])=>`<button type="button" data-a="wiz-format" data-v="${k}" aria-pressed="${W.format===k}" style="--c:${X.color}"><span style="color:${X.color}">${ICONS[k]}</span><b>${esc(X.name)}</b><span>${esc(X.desc)}</span></button>`).join("")}</div>
+    <p class="hint" style="margin-top:14px">Свій формат (кулінарний батл, танцювальний турнір, кіберспорт) — оберіть найближчий і змініть критерії на кроці 3.</p>
+    <div class="actions"><button class="btn red" type="button" data-a="wiz-next" ${W.format?"":"disabled"}><span>Далі</span></button></div>`;
+  if(W.step===2)body=`<form data-form="wiz2" class="panel" style="max-width:720px"><h2 class="sec-title" style="font-size:20px">Деталі події · ${esc(F.name)}</h2>
+    <label for="w-title">Назва</label><input id="w-title" name="title" required maxlength="80" value="${esc(W.title)}" placeholder="${W.format==="latte"?"Осінній латте-арт баттл":"Кубок факультету"}">
+    <div class="row"><div><label for="w-date">Дата</label><input id="w-date" name="date" type="date" required value="${esc(W.date)}"></div><div><label for="w-city">Місто</label><input id="w-city" name="city" required maxlength="40" value="${esc(W.city)}"></div></div>
+    <label for="w-venue">Місце проведення</label><input id="w-venue" name="venue" required maxlength="80" value="${esc(W.venue)}">
+    <label for="w-org">Організатор</label><input id="w-org" name="organizer" required maxlength="80" value="${esc(W.organizer)}" placeholder="Студрада, кафедра, кав'ярня…">
+    <div class="actions"><button class="btn" type="button" data-a="wiz-back"><span>Назад</span></button><button class="btn red" type="submit"><span>Далі</span></button></div></form>`;
+  if(W.step===3)body=`<form data-form="wiz3" class="panel" style="max-width:820px"><h2 class="sec-title" style="font-size:20px">Критерії зі шаблону «${esc(F.short)}»</h2><p class="muted" style="font-size:14px;margin-top:6px">Змініть назви й максимуми під свою подію. Після публікації вони будуть зафіксовані.</p>
+    ${W.criteria.map((c,i)=>`<div class="critedit"><input name="cn${i}" value="${esc(c.name)}" required aria-label="Критерій ${i+1}"><input name="cm${i}" type="number" min="1" max="100" value="${F.scoring==="time"?"":esc(c.max)}" ${F.scoring==="time"?'disabled placeholder="час"':"required"} aria-label="Максимум"><button type="button" data-a="wiz-del" data-i="${i}" aria-label="Видалити" ${W.criteria.length<2?"disabled":""}>×</button></div>`).join("")}
+    ${F.scoring==="points"?`<button class="link" type="button" data-a="wiz-add" style="margin-top:10px">+ додати критерій</button>`:""}
+    <h3 style="margin-top:22px">Штрафи</h3>${W.penalties.map(p=>`<p class="hint">${esc(p.name)} — ${F.scoring==="time"?"+":"−"}${p.v} ${esc(F.penUnit)}</p>`).join("")}
+    <div class="actions"><button class="btn" type="button" data-a="wiz-back"><span>Назад</span></button><button class="btn red" type="submit"><span>Далі</span></button></div></form>`;
+  if(W.step===4)body=`<div class="panel" style="max-width:820px"><h2 class="sec-title" style="font-size:20px">Перевірте і опублікуйте</h2>
+    <p style="margin-top:12px"><b>${esc(W.title)}</b> · ${esc(F.name)} · ${W.date?dateUa(W.date):""} · ${esc(W.city)}, ${esc(W.venue)}</p>
+    <ul class="crit" style="margin-top:12px">${W.criteria.map(c=>`<li><span style="color:var(--ink)">${esc(c.name)}</span><b>${F.scoring==="time"?"час":`0–${c.max}`}</b></li>`).join("")}</ul>
+    <div class="lock" style="margin-top:18px">${ICONS.lock}<div><b>Під час публікації регламент буде зафіксовано</b><span class="muted">Обчислимо відбиток SHA-256. Пізніші зміни — лише новою версією з причиною, видимою всім.</span></div></div>
+    <div class="actions"><button class="btn" type="button" data-a="wiz-back"><span>Назад</span></button><button class="btn red" type="button" data-a="wiz-publish"><span>Опублікувати і зафіксувати</span></button></div></div>`;
+  return`<div class="head"><div><h1>Нова подія</h1><p class="lede">Шаблон формату заповнює регламент, критерії й штрафи — вам лишається назва, дата і місце.</p></div></div>
+    <div class="wsteps">${st.map((s,i)=>`<span class="${i+1===W.step?"on":i+1<W.step?"done":""}">${i+1}. ${s}</span>`).join("")}</div>${body}`;
 }
 
-/* ---- race ---- */
-function vRules(){
-  const e=state.event;
-  if(ui.editEvent||!e){const x=e||{name:"",cls:"Міні-боліди 1:10",date:"",venueUniId:"",rules:[]},F="event";
-    return`<section class="panel"><h2 class="sec-title">${e?"Редагувати етап":"Новий етап"}</h2>
-    <div class="row"><div><label for="f_e_name">Назва етапу</label><input id="f_e_name" data-form="${F}" data-f="name" value="${esc(d(F,"name",x.name))}"></div>
-    <div><label for="f_e_cls">Клас</label><select id="f_e_cls" data-form="${F}" data-f="cls">${Object.keys(CLASSES).map(c=>`<option ${d(F,"cls",x.cls)===c?"selected":""}>${c}</option>`).join("")}</select></div></div>
-    <div class="row"><div><label for="f_e_date">Дата</label><input id="f_e_date" type="date" data-form="${F}" data-f="date" value="${esc(d(F,"date",x.date))}"></div>
-    <div><label for="f_e_venue">Траса</label><select id="f_e_venue" data-form="${F}" data-f="venueUniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"venueUniId",x.venueUniId)===u.id?"selected":""}>${esc(u.track.name)} — ${esc(u.city)}</option>`).join("")}</select></div></div>
-    <label for="f_e_rules">Регламент — одне правило в рядку</label><textarea id="f_e_rules" data-form="${F}" data-f="rules">${esc(d(F,"rules",(x.rules||[]).join("\n")))}</textarea>
-    <div class="actions"><button class="btn red" data-a="save-event"><span>Опублікувати</span></button>${e?`<button class="btn" data-a="cancel-event"><span>Скасувати</span></button>`:""}</div></section>`}
-  const u=uni(e.venueUniId),lim=(CLASSES[e.cls]||{}).mass;
-  return`<div class="head"><div><h1>${esc(e.name)}</h1><p class="lede">${esc(e.cls)} · ліміт маси ${lim} кг · ${e.date?dateParts(e.date).full:""}${u?` · ${esc(u.track.name)}, ${esc(u.city)}`:""}</p></div><button class="btn notkiosk" data-a="edit-event"><span>Редагувати</span></button></div>
-  <div class="cols"><div>${trackSVG(u,{big:true})}${u?`<p class="muted" style="font-size:13px">${u.track.lengthM} м · ${u.track.turns} поворотів · червоним позначено перший сектор</p>`:""}</div>
-  <div><h2 class="sec-title" style="margin-bottom:12px">Регламент</h2><ol class="rules">${(e.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ol></div></div>`;
-}
-function vTeams(){
-  const e=state.event,lim=e&&CLASSES[e.cls]?CLASSES[e.cls].mass:null,F="team";
-  return`<div class="head"><div><h1>Команди і техком</h1><p class="lede">Паспорт машини та чек-лист допуску. Суддя бачить лише допущені команди.</p></div></div>
-  <div class="g3" style="margin-bottom:32px">${state.teams.map(t=>{const ok=admitted(t),n=CHECKS.filter(([k])=>t.checks&&t.checks[k]).length,u=uni(t.uniId),b=state.builds.find(x=>x.id===t.buildId),over=lim!=null&&+t.mass>lim;
-    return`<article class="card team ${ok?"ok":""}"><h3 style="font-size:19px">${esc(t.name)}</h3><div class="muted" style="font-size:13px;margin-bottom:10px">${esc(u?u.name:"")}${b?` · ${esc(b.name)} v${b.version||1}`:""}</div>
-    <div class="mono" style="font-size:13px;margin-bottom:8px">${esc(t.mass)} кг · ${esc(t.volt)} В</div>${over?`<div class="warn">Маса перевищує ліміт класу (${lim} кг)</div>`:""}
-    ${CHECKS.map(([k,l])=>`<label class="check"><input type="checkbox" data-a="check" data-id="${esc(t.id)}" data-k="${k}" ${t.checks&&t.checks[k]?"checked":""}>${l}</label>`).join("")}
-    <div class="${ok?"state-ok":"state-wait"}" style="margin-top:10px">${ok?"Допущено до заїздів":`Техком: ${n} з ${CHECKS.length}`}</div></article>`}).join("")||`<p class="empty">Команд ще немає</p>`}</div>
-  <section class="panel"><h2 class="sec-title">Реєстрація команди</h2>
-    <div class="row"><div><label for="f_t_name">Назва команди</label><input id="f_t_name" data-form="${F}" data-f="name" value="${esc(d(F,"name",""))}"></div>
-    <div><label for="f_t_uni">Університет</label><select id="f_t_uni" data-form="${F}" data-f="uniId">${state.universities.map(u=>`<option value="${esc(u.id)}" ${d(F,"uniId","")===u.id?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>
-    <div><label for="f_t_build">Конструктор</label><select id="f_t_build" data-form="${F}" data-f="buildId"><option value="">Власна розробка</option>${state.builds.map(b=>`<option value="${esc(b.id)}" ${d(F,"buildId","")===b.id?"selected":""}>${esc(b.name)} v${b.version||1}</option>`).join("")}</select></div></div>
-    <div class="row"><div><label for="f_t_mass">Маса, кг</label><input id="f_t_mass" type="number" step="0.01" min="0" data-form="${F}" data-f="mass" value="${esc(d(F,"mass",""))}"></div>
-    <div><label for="f_t_volt">Напруга батареї, В</label><input id="f_t_volt" type="number" step="0.1" min="0" data-form="${F}" data-f="volt" value="${esc(d(F,"volt",""))}"></div></div>
-    <div class="actions"><button class="btn red" data-a="add-team"><span>Зареєструвати команду</span></button></div></section>`;
-}
-function vJudge(){
-  const recent=[...state.laps].sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,8);
-  return`<div class="head"><div><h1>Пульт судді</h1><p class="lede">Секундомір або ручне введення. Кожне коло одразу з'являється на табло.</p></div></div>
-  <div class="cols"><section class="panel">
-    <label for="j_team">Команда на трасі</label><select id="j_team"><option value="">Оберіть команду</option>${state.teams.map(t=>`<option value="${esc(t.id)}" ${admitted(t)?"":"disabled"} ${t.id===judge.team?"selected":""}>${esc(t.name)}${admitted(t)?"":" — не допущена"}</option>`).join("")}</select>
-    <div class="clock mono ${judge.running?"run":""}" id="clock">${judge.running?fmt(Math.round(performance.now()-judge.start)):"0:00.000"}</div>
-    <div class="actions" style="margin-top:0"><button class="btn red" data-a="${judge.running?"lap":"start"}" ${judge.team?"":"disabled"}><span>${judge.running?"Фініш кола":"Старт"}</span></button><button class="btn" data-a="stop" ${judge.running?"":"disabled"}><span>Стоп</span></button><button class="btn" data-a="pen" ${judge.running?"":"disabled"}><span>+2 с ворота</span></button></div>
-    <p>Штраф на цьому колі: <b class="mono" id="penv">${judge.pen/1000} с</b></p>
-    <label for="f_manual">Або введіть час вручну (м:сс.ттт)</label>
-    <div class="row"><input id="f_manual" class="mono" placeholder="0:42.310"><button class="btn" style="flex:0 0 auto" data-a="manual" ${judge.team?"":"disabled"}><span>Додати коло</span></button></div>
-  </section>
-  <section><h2 class="sec-title" style="margin-bottom:8px">Останні кола</h2>${recent.length?`<ul class="laps">${recent.map(l=>{const t=state.teams.find(x=>x.id===l.teamId);return`<li><span>${esc(t?t.name:"?")}</span><span class="mono">${fmt(l.ms)}${l.penaltyMs?` +${l.penaltyMs/1000} с`:""}</span><button class="link" data-a="del-lap" data-id="${esc(l.id)}">Скасувати</button></li>`}).join("")}</ul>`:`<p class="empty">Ще немає кіл</p>`}</section></div>`;
-}
-function vBoard(){
-  const rows=standings(),lead=rows[0]?.best,e=state.event,u=e&&uni(e.venueUniId);
-  return`<div class="head"><div><h1>Табло</h1><p class="lede">${e?`${esc(e.name)} · ${esc(e.cls)}${u?` · ${esc(u.track.name)}`:""}`:""}</p></div><button class="btn" data-a="kiosk"><span>${document.body.classList.contains("kiosk")?"Вийти з режиму глядача":"Режим глядача"}</span></button></div>
-  <div class="kerb" aria-hidden="true"></div>
-  <div class="tower"><div class="scroll"><table><tr><th>Поз.</th><th>Команда</th><th>Найкраще коло</th><th>Відрив</th><th>Кіл</th><th>Штрафи</th></tr>
-  ${rows.map((r,i)=>{const x=uni(r.t.uniId);return`<tr class="${i===0?"p1":""} ${r.t.id===flashTeam?"flash":""}"><td class="pos"><span><b>${i+1}</b></span></td><td class="tname">${esc(r.t.name)}<small>${esc(x?x.name:"")}</small></td>
-    <td class="mono ${i===0?"fastest":""}">${fmt(r.best)}</td><td class="mono">${i===0?"Лідер":"+"+((r.best-lead)/1000).toFixed(3)}</td><td class="mono">${r.n}</td><td class="mono">${r.pen?"+"+r.pen/1000+" с":"—"}</td></tr>`}).join("")||`<tr><td colspan="6" class="empty">Заїзди ще не почались</td></tr>`}
-  </table></div></div>
-  <p class="muted" style="font-size:13px">Найкраще коло з урахуванням штрафів. Фіолетовим — найшвидше коло етапу. Рядок підсвічується, коли команда проїжджає нове коло.</p>`;
-}
-function vRace(){
-  const tabs=[["rules","Регламент і траса"],["teams","Техком"],["judge","Суддя"],["board","Табло"]];
-  return`<div class="subnav" role="tablist">${tabs.map(([k,l])=>`<button data-race="${k}" aria-current="${ui.race===k}">${l}</button>`).join("")}</div>
-  ${ui.race==="rules"?vRules():ui.race==="teams"?vTeams():ui.race==="judge"?vJudge():vBoard()}`;
-}
-
-/* ============ render ============ */
+/* ================= router ================= */
+let ui={judge:null,pid:null,pf:"all",appealFor:null};
+function parse(){const h=location.hash.replace(/^#/,"")||"/";const [p,qs]=h.split("?");return{parts:p.split("/").filter(Boolean),q:new URLSearchParams(qs||"")}}
 function render(){
-  const newest=state.laps.reduce((a,l)=>!a||(l.at||0)>(a.at||0)?l:a,null);
-  if(newest&&lastLap&&newest.id!==lastLap){flashTeam=newest.teamId;setTimeout(()=>{flashTeam=null},2600)}
-  if(newest)lastLap=newest.id;
-  document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.go===ui.view?"page":"false"));
-  const a=document.activeElement;
-  if(a&&a.id&&a.id.startsWith("f_")&&document.getElementById("main").contains(a)){render.pending=true;return}
-  render.pending=false;
-  $("#main").innerHTML=({home:vHome,news:vNews,tracks:vTracks,builds:vBuilds,makers:vMakers,race:vRace}[ui.view]||vHome)();
+  const {parts,q}=parse();const v=parts[0]||"home";
+  document.documentElement.style.setProperty("--accent","#E10600");
+  let html;
+  if(v==="events")html=vEvents(q);
+  else if(v==="e")html=vEvent(parts[1],parts[2]||"overview");
+  else if(v==="league")html=vLeague(q);
+  else if(v==="organizers")html=vOrganizers();
+  else if(v==="create")html=vCreate();
+  else html=vHome();
+  $("#main").innerHTML=html;
+  const navKey=v==="e"?"events":v==="create"?"organizers":v;
+  document.querySelectorAll("#nav a").forEach(a=>a.setAttribute("aria-current",a.dataset.nav===navKey?"page":"false"));
+  const e=v==="e"&&ev(parts[1]);document.title=(e?e.title+" — ":"")+"LovkoTech";
+  if(watch.run)tick();
 }
-function tick(){if(!judge.running)return;const c=$("#clock");if(c)c.textContent=fmt(Math.round(performance.now()-judge.start));judge.raf=requestAnimationFrame(tick)}
-function go(v,race){ui.view=v;if(race)ui.race=race;ui.editBuild=null;ui.editEvent=false;saveUi();document.body.classList.remove("kiosk");render();window.scrollTo(0,0)}
+let lastRoute="";
+window.addEventListener("hashchange",()=>{const r=location.hash.split("?")[0];if(r!==lastRoute){ui.appealFor=null;lastRoute=r;window.scrollTo(0,0)}document.body.classList.remove("kiosk");render()});
+function tick(){if(!watch.run)return;const c=$("#clock");if(c)c.textContent=fmtMs(performance.now()-watch.start);watch.raf=requestAnimationFrame(tick)}
 
-/* ============ events ============ */
-document.addEventListener("input",e=>{const t=e.target;if(t.dataset.form){(drafts[t.dataset.form]??={})[t.dataset.f]=t.value}});
-document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(render.pending&&!(a&&a.id&&a.id.startsWith("f_")))render()},0));
-document.addEventListener("change",e=>{
-  const t=e.target;
-  if(t.dataset.form){(drafts[t.dataset.form]??={})[t.dataset.f]=t.value}
-  if(t.dataset.a==="check"){const tm=state.teams.find(x=>x.id===t.dataset.id);if(tm)write(api.update("teams",tm.id,{checks:{...(tm.checks||{}),[t.dataset.k]:t.checked}}))}
-  if(t.id==="j_team"){judge.team=t.value;if(judge.running){judge.running=false;cancelAnimationFrame(judge.raf)}render()}
+/* ================= actions ================= */
+function addLog(e,who,kind,text,pid,extra){const en=Object.assign({id:uid("l"),t:new Date().toISOString(),who,kind,text,pid:pid||null},extra||{});e.protocol.push(en);return en}
+document.addEventListener("click",async ev0=>{
+  const b=ev0.target.closest("[data-a]");if(!b)return;
+  const a=b.dataset.a,e=b.dataset.id&&ev(b.dataset.id);
+  if(a==="reset"){if(confirm("Скинути всі ваші зміни в демо?")){localStorage.removeItem(KEY);S=seed();await ensureHashes();save();location.hash="#/";render();toast("Демо скинуто")}}
+  if(a==="verify"&&e){const h=await sha(lockPayload(e));const out=$("#verifyOut");out.innerHTML=h===e.locked.hash?`<span class="ok-mark">✓ Збігається: регламент не змінювали після фіксації</span>`:`<span class="warn">✗ Не збігається з опублікованим відбитком</span>`}
+  if(a==="confirm"&&e){const p=part(e,b.dataset.p);p.status="confirmed";addLog(e,"Організатор","reg",`допущено до участі: ${esc(p.name)}`,p.id);save();render();toast("Учасника допущено")}
+  if(a==="watch"){if(watch.run){watch.ms=Math.round(performance.now()-watch.start);watch.run=false;cancelAnimationFrame(watch.raf)}else{watch.run=true;watch.start=performance.now();watch.ms=null}render()}
+  if(a==="void-lap"&&e){const l=e.laps.find(x=>x.id===b.dataset.l);l.void=true;const en=e.protocol.find(x=>x.lapId===l.id);if(en)en.voided=true;addLog(e,ui.judge||e.judges[0],"void",`скасовано коло ${fmtMs(l.ms)}`,l.pid);save();render();toast("Коло скасовано, запис лишився в протоколі")}
+  if(a==="pf"){ui.pf=b.dataset.v;render()}
+  if(a==="appeal-open"){ui.appealFor=b.dataset.l;render();const f=document.querySelector("#ap-r");f&&f.focus()}
+  if(a==="appeal-cancel"){ui.appealFor=null;render()}
+  if(a==="trust"){document.querySelectorAll("#trustBox .chip").forEach(c=>c.setAttribute("aria-pressed",c===b));sendFeedback({kind:"trust",answer:b.dataset.v});$("#trustBox p").textContent="Дякуємо! Відповідь враховано.";}
+  if(a==="kiosk"){document.body.classList.add("kiosk");window.scrollTo(0,0)}
+  if(a==="kiosk-off")document.body.classList.remove("kiosk");
+  if(a==="csv"&&e){const rows=[["час","хто","тип","учасник","запис"]].concat(e.protocol.map(x=>[x.t,x.who,x.kind,x.pid?(part(e,x.pid)||{}).name:"",x.text.replace(/<[^>]+>/g,"")+(x.voided?" (скасовано)":"")]));
+    const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c==null?"":c).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const l=document.createElement("a");l.href=url;l.download=`protocol-${e.id}.csv`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+  /* wizard */
+  if(a==="wiz-format"){wiz.format=b.dataset.v;const F=FORMATS[wiz.format];wiz.criteria=F.criteria.map(c=>({...c}));wiz.penalties=F.penalties.map(c=>({...c}));render()}
+  if(a==="wiz-next"){wiz.step=Math.min(4,wiz.step+1);render()}
+  if(a==="wiz-back"){wiz.step=Math.max(1,wiz.step-1);render()}
+  if(a==="wiz-add"){collectWiz3();wiz.criteria.push({id:uid("c"),name:"Новий критерій",max:10});render()}
+  if(a==="wiz-del"){collectWiz3();wiz.criteria.splice(+b.dataset.i,1);render()}
+  if(a==="wiz-publish"){const F=FORMATS[wiz.format];const id=(wiz.title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"event")+"-"+Math.random().toString(36).slice(2,6);
+    const e2={id,format:wiz.format,title:wiz.title,city:wiz.city,venue:wiz.venue,date:wiz.date,status:"registration",organizer:wiz.organizer,criteria:wiz.criteria.map(c=>({...c})),penalties:wiz.penalties,
+      rules:["Регламент сформовано з шаблону формату «"+F.short+"»","Оцінки й штрафи записуються у відкритий протокол","Апеляцію можна подати на будь-який запис протоколу"],judges:["Журі формується"],participants:[],scores:{},laps:[],protocol:[],appeals:[],regHistory:[]};
+    e2.locked={at:new Date().toISOString()};e2.locked.hash=await sha(lockPayload(e2));addLog(e2,wiz.organizer,"reg",`регламент опубліковано і зафіксовано, відбиток ${e2.locked.hash.slice(0,12)}…`);
+    S.events.push(e2);save();wiz={step:1,format:null,title:"",city:"",venue:"",date:"",organizer:"",criteria:[],penalties:[]};location.hash=`#/e/${id}/rules`;toast("Подію опубліковано, регламент зафіксовано")}
+  /* feedback */
+  if(a==="fb-open")openFb();
+  if(a==="fb-close")$("#fbDlg").close();
+  if(a==="fb-star"){fb.rating=+b.dataset.v;paintFb()}
+  if(a==="fb-role"){fb.role=fb.role===b.dataset.v?"":b.dataset.v;paintFb()}
 });
-document.addEventListener("click",async e=>{
-  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go,g.dataset.race);return}
-  const r=e.target.closest("[data-race]");if(r){ui.race=r.dataset.race;ui.editEvent=false;saveUi();render();return}
-  const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;const a=b.dataset.a;
-  if(a==="vote"){await write(api.set("votes",uid,{uniId:b.dataset.id,at:Date.now()}),"Голос зараховано")}
-  else if(a==="bfilter"){ui.buildFilter=b.dataset.v;saveUi();render()}
-  else if(a==="mfilter"){ui.makerFilter=b.dataset.v;saveUi();render()}
-  else if(a==="new-build"){ui.editBuild="new";delete drafts.build;render()}
-  else if(a==="edit-build"){ui.editBuild=b.dataset.id;delete drafts.build;render();window.scrollTo({top:0,behavior:"smooth"})}
-  else if(a==="cancel-build"){ui.editBuild=null;delete drafts.build;render()}
-  else if(a==="save-build"){
-    const isNew=ui.editBuild==="new",old=isNew?{}:state.builds.find(x=>x.id===ui.editBuild)||{},dr=drafts.build||{};
-    const pick=k=>(k in dr?dr[k]:old[k])??"";
-    const x={name:String(pick("name")).trim(),uniId:pick("uniId")||state.universities[0]?.id,cls:pick("cls")||"Міні-боліди 1:10",mass:+pick("mass")||0,motor:pick("motor"),battery:pick("battery"),drive:pick("drive"),sensors:pick("sensors"),license:pick("license")||"Відкрита",desc:old.desc||"",
-      version:isNew?1:(old.version||1)+1,note:isNew?"Перша версія":(dr.note||"Оновлено специфікацію"),updatedAt:Date.now()};
-    if(!x.name){toast("Вкажіть назву машини");return}
-    const ok=await write(isNew?api.add("builds",x):api.set("builds",ui.editBuild,x),isNew?"Конструктор опубліковано":`Збережено як v${x.version}`);
-    if(ok){ui.editBuild=null;delete drafts.build;render()}}
-  else if(a==="partner"){toast("Дякуємо! Заявку на партнерство надіслано")}
-  else if(a==="contact"){toast(`Запит надіслано: ${b.dataset.name}`)}
-  else if(a==="edit-event"){ui.editEvent=true;delete drafts.event;render()}
-  else if(a==="cancel-event"){ui.editEvent=false;delete drafts.event;render()}
-  else if(a==="save-event"){const o=state.event||{},dr=drafts.event||{},p=k=>k in dr?dr[k]:o[k];
-    const ev={name:String(p("name")||"Новий етап").trim(),cls:p("cls")||"Міні-боліди 1:10",date:p("date")||"",venueUniId:p("venueUniId")||state.universities[0]?.id||"",
-      rules:("rules" in dr?dr.rules.split("\n"):(o.rules||[])).map(s=>String(s).trim()).filter(Boolean)};
-    if(await write(api.setEvent(ev),"Етап опубліковано")){ui.editEvent=false;delete drafts.event;render()}}
-  else if(a==="add-team"){const dr=drafts.team||{};const name=(dr.name||"").trim();if(!name){toast("Вкажіть назву команди");return}
-    const t={name,uniId:dr.uniId||state.universities[0]?.id||"",buildId:dr.buildId||"",mass:+dr.mass||0,volt:+dr.volt||0,createdAt:Date.now(),checks:{mass:false,estop:false,battery:false,sensors:false}};
-    if(await write(api.add("teams",t),"Команду зареєстровано")){delete drafts.team;render()}}
-  else if(a==="start"){judge.start=performance.now();judge.running=true;judge.pen=0;render();tick()}
-  else if(a==="lap"){const ms=Math.round(performance.now()-judge.start),pen=judge.pen;judge.start=performance.now();judge.pen=0;
-    write(api.add("laps",{teamId:judge.team,ms,penaltyMs:pen,at:Date.now()}),`Коло ${fmt(ms)} записано`);render();tick()}
-  else if(a==="stop"){judge.running=false;cancelAnimationFrame(judge.raf);render()}
-  else if(a==="pen"){judge.pen+=PENALTY;const p=$("#penv");if(p)p.textContent=judge.pen/1000+" с"}
-  else if(a==="manual"){const inp=$("#f_manual"),ms=parseTime(inp.value);if(ms==null||ms<=0){toast("Формат часу: 0:42.310");return}
-    inp.value="";inp.blur();await write(api.add("laps",{teamId:judge.team,ms,penaltyMs:0,at:Date.now()}),`Коло ${fmt(ms)} записано`)}
-  else if(a==="del-lap"){await write(api.del("laps",b.dataset.id),"Коло скасовано")}
-  else if(a==="kiosk"){document.body.classList.toggle("kiosk");render()}
+document.addEventListener("change",x=>{const t=x.target;if(t.dataset&&t.dataset.ui){ui[t.dataset.ui]=t.value;render()}});
+function collectWiz3(){const f=document.querySelector('[data-form="wiz3"]');if(!f)return;wiz.criteria.forEach((c,i)=>{const n=f.elements["cn"+i],m=f.elements["cm"+i];if(n)c.name=n.value.trim()||c.name;if(m&&!m.disabled)c.max=Math.max(1,+m.value||c.max)})}
+document.addEventListener("submit",async x=>{
+  const f=x.target;if(!f.dataset.form)return;x.preventDefault();
+  const d=Object.fromEntries(new FormData(f).entries());const e=f.dataset.id&&ev(f.dataset.id);const kind=f.dataset.form;
+  if(kind==="register"){const F=FORMATS[e.format];const p={id:uid("p"),name:d.name.trim(),org:d.org.trim(),status:"pending"};F.fields.forEach(fl=>{if(d[fl.id])p[fl.id]=fl.type==="number"?+d[fl.id]:d[fl.id].trim()});
+    e.participants.push(p);addLog(e,p.name,"reg",`заявку подано: ${esc(p.name)} (${esc(p.org)})`,p.id);save();render();toast("Заявку подано — організатор підтвердить допуск")}
+  if(kind==="score"){const j=f.dataset.judge,pid=f.dataset.p;const prev=(e.scores[pid]||{})[j];const sc={};
+    for(const c of e.criteria){const v=+d[c.id];if(!(v>=0&&v<=c.max)){toast(`${c.name}: від 0 до ${c.max}`);return}sc[c.id]=v}
+    (e.scores[pid]=e.scores[pid]||{})[j]=sc;const fmt=v=>String(v).replace(".",",");
+    if(prev){const ch=e.criteria.filter(c=>prev[c.id]!==sc[c.id]).map(c=>`${esc(c.name)}: <span class="old">${fmt(prev[c.id])}</span> → ${fmt(sc[c.id])}`);
+      addLog(e,j,"edit",(ch.length?ch.join("; "):"без змін у балах")+`. Причина: «${esc(d.reason)}»`,pid);toast("Виправлення записано в протокол")}
+    else{addLog(e,j,"score",`оцінка: ${e.criteria.map(c=>`${esc(c.name)} ${fmt(sc[c.id])}`).join(" · ")}`,pid);toast("Оцінку збережено")}
+    save();render()}
+  if(kind==="penalty"){const p=e.penalties.find(z=>z.id===d.pen);addLog(e,f.dataset.judge,"penalty",`${esc(p.name)}: −${p.v} ${FORMATS[e.format].penUnit}${d.note?` («${esc(d.note)}»)`:""}`,f.dataset.p,{pen:p.id,v:p.v});save();render();toast("Штраф записано")}
+  if(kind==="lap"){const ms=parseTime(d.t||"");if(ms==null||ms<1000){toast("Вкажіть час у форматі 0:41.620");return}
+    const pid=ui.pid&&e.participants.some(p=>p.id===ui.pid&&p.status==="confirmed")?ui.pid:e.participants.find(p=>p.status==="confirmed").id;
+    const pen=d.pen?e.penalties.find(z=>z.id===d.pen):null;const lap={id:uid("lap"),pid,ms,pen:pen?pen.v:0,penId:pen?pen.id:null,t:new Date().toISOString()};e.laps.push(lap);
+    addLog(e,ui.judge||e.judges[0],"lap",`коло ${fmtMs(ms)}${pen?` · штраф +${pen.v} с (${esc(pen.name)})`:""}`,pid,{lapId:lap.id});watch.ms=null;save();render();toast("Коло зараховано")}
+  if(kind==="appeal"){const en=e.protocol.find(z=>z.id===f.dataset.l);const p=part(e,en.pid);const ap={id:uid("a"),entryId:en.id,pid:p.id,by:p.name,reason:d.reason.trim(),status:"open",t:new Date().toISOString()};
+    e.appeals.push(ap);addLog(e,p.name,"appeal",`подано апеляцію: «${esc(ap.reason)}»`,p.id,{appealId:ap.id});ui.appealFor=null;save();render();toast("Апеляцію подано — її бачать усі учасники")}
+  if(kind==="resolve"){const ap=e.appeals.find(z=>z.id===f.dataset.ap);const dec=x.submitter&&x.submitter.value||"rejected";ap.status=dec;ap.reply=d.reply.trim();
+    const en=e.protocol.find(z=>z.id===ap.entryId);let extra="";
+    if(dec==="accepted"&&en){if(en.kind==="penalty"){en.voided=true;extra=" Штраф скасовано."}else if(en.lapId){const l=e.laps.find(z=>z.id===en.lapId);if(l&&l.pen){l.pen=0;extra=" Штрафні секунди знято."}}else extra=" Суддя має переоцінити учасника."}
+    addLog(e,e.judges[0],"resolve",`апеляцію ${dec==="accepted"?"прийнято":"відхилено"}: «${esc(ap.reply)}».${extra}`,ap.pid,{appealId:ap.id});save();render();toast(dec==="accepted"?"Апеляцію прийнято":"Апеляцію відхилено")}
+  if(kind==="regchange"){const c=e.criteria.find(z=>z.id===d.crit);const old=lockPayload(e);const prevHash=e.locked.hash;
+    if(d.max!=null){c.max=Math.max(1,+d.max)}if(d.name)c.name=d.name.trim();
+    e.regHistory.push({at:new Date().toISOString(),reason:d.reason.trim(),prevHash});e.locked={at:new Date().toISOString(),hash:await sha(lockPayload(e))};
+    addLog(e,"Організатор","reg",`нова версія регламенту (${esc(c.name)}). Причина: «${esc(d.reason)}». Попередній відбиток ${prevHash.slice(0,12)}…, новий ${e.locked.hash.slice(0,12)}…`);save();render();toast("Створено нову версію регламенту")}
+  if(kind==="wiz2"){Object.assign(wiz,{title:d.title.trim(),date:d.date,city:d.city.trim(),venue:d.venue.trim(),organizer:d.organizer.trim()});wiz.step=3;render()}
+  if(kind==="wiz3"){collectWiz3();wiz.step=4;render()}
 });
 
-/* ============ partners carousel ============ */
-const GLYPHS={
-  slant:'<path d="M6 2h10L10 22H0z" fill="currentColor"/><path d="M18 2h6l-6 20h-6z" fill="#E10600"/>',
-  ring:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="3.5" fill="#E10600"/>',
-  bolt:'<path d="M14 1L3 14h7l-2 9 11-13h-7z" fill="currentColor"/>',
-  hex:'<path d="M12 1l10 6v10l-10 6L2 17V7z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 7l5 3v4l-5 3-5-3v-4z" fill="#E10600"/>',
-  chevron:'<path d="M2 3h6l7 9-7 9H2l7-9z" fill="currentColor"/><path d="M12 3h6l7 9-7 9h-6l7-9z" fill="#E10600"/>',
-  delta:'<path d="M12 2l11 20H1z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 11l4 7H8z" fill="currentColor"/>'
-};
-const PARTNERS=[
-  ["VoltGrid","Генеральний партнер","bolt",true],
-  ["Nova Embedded","Технологічний партнер","hex"],
-  ["Steppe Dynamics","Партнер етапу","chevron"],
-  ["SkyForge Robotics","Партнер класу дронів","delta"],
-  ["Iron Delta","Партнер з виробництва","slant"],
-  ["Dnipro Motion","Партнер етапу","ring"],
-  ["Кіловат Компоненти","Постачальник ліги","bolt"],
-  ["PrintFab Дніпро","Виробничий партнер","hex"],
-  ["Фонд Інженерів","Грантовий партнер","ring"]
-];
-function renderPartners(){
-  const one=PARTNERS.map(([n,t,g,gold])=>`<div class="plogo ${gold?"gold":""}"><svg width="26" height="24" viewBox="0 0 26 24" aria-hidden="true">${GLYPHS[g]}</svg><div><b>${esc(n)}</b><small>${esc(t)}</small></div></div>`).join("");
-  $("#marquee").innerHTML=`<div class="marquee-track"><div style="display:flex">${one}</div><div style="display:flex" aria-hidden="true">${one}</div></div>`;
+/* ================= feedback ================= */
+const API="/api/feedback";
+const ROLES=["Організатор / студрада","Суддя","Учасник","Глядач","Інше"];
+let fb={rating:0,role:""};
+function paintFb(){
+  $("#fbStars").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-a="fb-star" data-v="${i}" aria-pressed="${i<=fb.rating}" aria-label="${i} з 5">★</button>`).join("");
+  $("#fbRoles").innerHTML=ROLES.map(r=>`<button type="button" class="chip" data-a="fb-role" data-v="${r}" aria-pressed="${fb.role===r}">${r}</button>`).join("");
 }
+function ctx(){const {parts}=parse();const e=parts[0]==="e"&&ev(parts[1]);return{screen:location.hash||"#/",format:e?e.format:""}}
+function openFb(){fb={rating:0,role:""};paintFb();$("#fbComment").value="";$("#fbErr").textContent="";const c=ctx();$("#fbCtx").textContent=`Екран: ${c.screen}${c.format?" · формат: "+FORMATS[c.format].short:""}`;$("#fbDlg").showModal();loadStats()}
+async function sendFeedback(body){
+  const payload=Object.assign({},ctx(),body,{clientTs:new Date().toISOString()});
+  try{const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});if(!r.ok)throw new Error(r.status);loadStats();return true}
+  catch(err){try{const qq=JSON.parse(localStorage.getItem("lt3.fbq")||"[]");qq.push(payload);localStorage.setItem("lt3.fbq",JSON.stringify(qq.slice(-50)))}catch(e){}return false}
+}
+async function flushQueue(){let qq;try{qq=JSON.parse(localStorage.getItem("lt3.fbq")||"[]")}catch(e){return}if(!qq.length)return;const left=[];
+  for(const p of qq){try{const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(p)});if(!r.ok)throw 0}catch(e){left.push(p)}}
+  try{localStorage.setItem("lt3.fbq",JSON.stringify(left))}catch(e){}}
+$("#fbForm").addEventListener("submit",async x=>{x.preventDefault();if(!fb.rating){$("#fbErr").textContent="Оберіть оцінку від 1 до 5";return}
+  const btn=$("#fbSend");btn.disabled=true;const ok=await sendFeedback({kind:"rating",rating:fb.rating,role:fb.role,comment:$("#fbComment").value.trim()});btn.disabled=false;
+  $("#fbDlg").close();toast(ok?"Дякуємо! Відгук надіслано команді":"Відгук збережено, надішлемо, щойно з'явиться зв'язок")});
+async function loadStats(){try{const r=await fetch(API+"/stats",{cache:"no-store"});if(!r.ok)return;const s=await r.json();if(!s.count)return;
+  const n=s.count,m10=n%10,m100=n%100,w=m10===1&&m100!==11?"раз":m10>=2&&m10<=4&&(m100<12||m100>14)?"рази":"разів";
+  const txt=`Прототип оцінили ${n} ${w} · середня оцінка ${String(s.avg).replace(".",",")} з 5`;
+  $("#fbStat").textContent=txt+". Середню оцінку ми показуємо публічно.";$("#footStat").textContent=txt+" ·"}catch(e){}}
 
-/* ============ boot ============ */
-renderPartners();
-try{uid=localStorage.getItem("pw2.uid")||("anon_"+Math.random().toString(36).slice(2,10));localStorage.setItem("pw2.uid",uid)}catch(e){uid="anon_"+Math.random().toString(36).slice(2,10)}
-Object.assign(state,demoData());
-render();
-if(window.claude&&window.claude.use){
-  window.claude.use("user").then(async u=>{if(u){try{const id=await u.id();if(id){uid=id;render()}}catch(e){}}}).catch(()=>{});
-  window.claude.use("db").then(db=>{if(!db)return;COLS.forEach(c=>state[c]=[]);state.event=null;lastLap=null;api=liveApi(db);setLive(true,"Live");render()}).catch(()=>{});
-}
+/* ================= boot ================= */
+lastRoute=location.hash.split("?")[0];
+render();ensureHashes();loadStats();flushQueue();
 </script>
 </body>
 </html>
